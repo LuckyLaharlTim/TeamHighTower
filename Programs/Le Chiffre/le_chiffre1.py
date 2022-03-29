@@ -30,13 +30,18 @@
 ##  TO-DO: implement percent checks for plain text, decode c-e with program to ensure it's working completely
 
 import sys # import sys for standard input from command line
+import math
 import base64
 
 # variables for debug lines and showing the bestShifts if we need to
 #  find doubly -> multiply encrypted plaintext
 DEBUG = False
 DEBUG2 = False
-DISPLAY_SHIFTS = True
+DISPLAY_SHIFTS = False
+PERCENT = 0.3
+DECIDEFUNCTION = 0
+# 0 - most dictionary matches
+# 1 - most occurences of word 'the'
 
 ## given alphabet strings
 alph = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -63,8 +68,8 @@ alph7 = "ABCDEFGHIJ012345abcdedfhijklmnopKLMNOPQRS67qrstuvwxyTUVWXYZ89z"
 ## Variables to Change!
 #######################
 
-alphaCandidate = alph2 # <--- CHANGE IF NEEDED
-filename = "dictionary-01.txt" # <--- CHANGE IF NEEDED
+alphaCandidate = alph3 # <--- CHANGE IF NEEDED
+filename = "dictionary-01d.txt" # <--- CHANGE IF NEEDED
 keyStartsWith = [] # <--- CHANGE (list) IF NEEDED
 
 ##################################################
@@ -104,6 +109,16 @@ def checkCase(letter):
     else:
         return None
 
+# function that runs appropriate 'best plain text' function
+#  ~ all current functions look for the plaintext with the most of something
+# parameter(s): func - int variable above corresponding to function to run
+#               a - the potential plaintext (a string)
+def decide(func, a):
+    if not func: # or func == 0
+        return countWords(a)
+    if func == 1:
+        return countThe(a)
+
 # returns position in alpha list for given character
 def getOrdinal(letter):
     return alpha.index(letter)
@@ -131,9 +146,18 @@ def modifyLen(x,y):
 
 # conducts shift of alphabet by given SHIFT positions for each character to cipher text
 #  encryption just has the inverse of this in process(message)
-def getPlainT(text, key):
+def getPlainT(text, key, testing):
     plain = ""
     keyIndex = 0 # if needed
+
+    # shorten ciphertext to shorten the amount of time we
+    #  spend making our decision on best plaintext
+    if testing:
+        mText = []
+        limit = math.floor(len(text) * PERCENT)
+        for i in range(limit):
+            mText.append(text[i])
+        text = mText
     
     # for every character . . .
     for i in range(0,len(text)):
@@ -174,14 +198,14 @@ def bestPlainT(text, simple):
             skipWord = True
       
         if not skipWord:
-            posPlain = getPlainT(text,modifyLen(word, text))
+            posPlain = getPlainT(text,modifyLen(word, text),True)
 ##            if getAll:
 ##                filename = f"key{i}.txt"
 ##                f = open(filename, "w")
 ##                f.write(posPlain)
 ##            elif not getAll:
             # could be countWords, countThe, etc.
-            wordCount = countWords(posPlain)
+            wordCount = decide(DECIDEFUNCTION,posPlain)
             wordCounts.append(wordCount)
             words.append(word)
 
@@ -199,7 +223,7 @@ def bestPlainT(text, simple):
         
     # return everything for display
     #  (most likely plaintext & the alphabet shift used to obtain it)
-    return [getPlainT(text, modifyLen(bestKey,text)), bestKey]
+    return [getPlainT(text, modifyLen(bestKey,text), False), bestKey]
 
     ##########
     # IDEA
@@ -224,7 +248,33 @@ def countWords(posPlain):
 
     
     return wordCount
+
+
+# function to count the's in text
+#  that are also in specified dictionary
+def countThe(posPlain):
+    wordCount = 0
+    words = posPlain.split()
+    for word in words:
+        if word in ["The", "the"]:
+            wordCount += 1
+
     
+    return wordCount
+
+#############
+# IN PROGRESS
+#############
+# function to count the's in text
+#  that are also in specified dictionary
+def countLets(posPlain, alpha):
+    lets = [0]*len(alpha)
+    for char in posPlain:
+        lets[getOrdinal(char)] += 1
+
+    
+    return lets
+#####################################
 
 # function to process message (encrypting, decrypting most likely plaintext,
 #  or simply decrypting with a stated shift
@@ -267,7 +317,7 @@ def process(message):
     elif sys.argv[1] == "-c":
         KEY = sys.argv[2]
         KEY = modifyLen(KEY, text)
-        outputString += f"KEY={sys.argv[2]}:\n"+getPlainT(text,KEY)
+        outputString += f"KEY={sys.argv[2]}:\n"+getPlainT(text,KEY,False)
                
 
 
