@@ -1,8 +1,15 @@
 recording times for 03c ciphertext to gauge efficiency
 
 Try 1: 
-time - 
-parameters - 
-accuracy - 
-(if correct, proper alphabet, dict., etc.) - 
-changes made -
+time - 55.75531482696533 seconds (under 1 minute)
+
+parameters - 30% of plaintext, most dictionary matches
+
+accuracy - correct
+
+(if correct: proper alphabet, dict., etc.) - 
+	alphabet: alph4
+	dictionary: dictionary-01.txt
+	key: uncharacteristically
+
+changes made - none from try 3 of 0cd
