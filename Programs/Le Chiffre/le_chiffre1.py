@@ -32,11 +32,13 @@
 import sys # import sys for standard input from command line
 import math
 import base64
+from time import time
 
 # variables for debug lines and showing the bestShifts if we need to
 #  find doubly -> multiply encrypted plaintext
 DEBUG = False
 DEBUG2 = False
+DEBUGTIME = True
 DISPLAY_SHIFTS = False
 PERCENT = 0.3
 DECIDEFUNCTION = 0
@@ -44,17 +46,17 @@ DECIDEFUNCTION = 0
 # 1 - most occurences of word 'the'
 
 ## given alphabet strings
-alph = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+alph1 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-alph1 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+alph2 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-alph2 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$%^&*()-_=+[{]}\|;:'\",<.>/? "
+alph3 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$%^&*()-_=+[{]}\|;:'\",<.>/? "
 
-alph3 = " -,;:!?/.'"+'"()[]$&#%012345789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxyYzZ'
+alph4 = " -,;:!?/.'"+'"()[]$&#%012345789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxyYzZ'
 
-alph4 = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_:./@#$%&*"
+alph5 = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_:./@#$%&*"
 
-alph5 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$%^&*()-_=+[{]}\|;:'\",<.>/? "
+alph6 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$%^&*()-_=+[{]}\|;:'\",<.>/? "
 
 alphTable = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_:./@#$%&*"
 
@@ -68,9 +70,10 @@ alph7 = "ABCDEFGHIJ012345abcdedfhijklmnopKLMNOPQRS67qrstuvwxyTUVWXYZ89z"
 ## Variables to Change!
 #######################
 
-alphaCandidate = alph3 # <--- CHANGE IF NEEDED
+alphaCandidate = alph4 # <--- CHANGE IF NEEDED
 filename = "dictionary-01d.txt" # <--- CHANGE IF NEEDED
 keyStartsWith = [] # <--- CHANGE (list) IF NEEDED
+# keyStartsWith should have strings (or chars) of letters
 
 ##################################################
 
@@ -331,5 +334,11 @@ def process(message):
 
 # differentiate between arguments of encoding or decoding
 if __name__ == "__main__":
+    if DEBUGTIME:
+        t0 = time()
     message = sys.stdin.read()
     process(message)
+    if DEBUGTIME:
+        t1= time()
+        timedelta = t1-t0
+        sys.stdout.write(f"\nOutput written after {timedelta} seconds")
