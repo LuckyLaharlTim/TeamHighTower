@@ -1,0 +1,18 @@
+try 1: 659.9953255653381 seconds
+	~ 11 minutes
+	- conducted with 15% of ciphertext 
+	decoded per word
+
+try 2: 1320.3224091529846 seconds
+	~ 22 minutes
+	- conducted with 30% of ciphertext 
+	decoded per word
+
+try 3: 1386.6008369922638 seconds
+	~ 23 minutes
+	- conducted with 30% of ciphertext 
+	decoded per word
+	- got correct plaintext
+		* KEY=Money, 
+		   alphabet is alph4, 
+		   dictionary is "...-01d.txt"

@@ -1,0 +1,8 @@
+recording times for 03c ciphertext to gauge efficiency
+
+Try 1: 
+time - 
+parameters - 
+accuracy - 
+(if correct, proper alphabet, dict., etc.) - 
+changes made -
