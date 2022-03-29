@@ -1,2 +1,2 @@
 # TeamHighTower
-Working on Challenge for CSC 444 - Digilormo
+Working on Challenge & Programs for CSC 444 - Digilormo
