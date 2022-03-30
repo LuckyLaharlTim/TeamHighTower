@@ -16,3 +16,12 @@ try 3: 1386.6008369922638 seconds
 		* KEY=Money, 
 		   alphabet is alph4, 
 		   dictionary is "...-01d.txt"
+
+try 4: 312.03271746635437 seconds
+	~ 5 minutes
+	- conducted with 30% of ciphertext 
+	decoded per word
+	- added functionality to return as soon
+	as ~1/9th (PERCENT^2) of whole text was in dictionary;
+	at odds if you use a different deciding method though;
+	put in toggle variable 'CUTOFFBYDICTMATCH' to control this

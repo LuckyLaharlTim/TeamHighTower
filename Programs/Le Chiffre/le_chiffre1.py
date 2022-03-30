@@ -40,6 +40,8 @@ DEBUG = False
 DEBUG2 = False
 DEBUGTIME = True
 DISPLAY_SHIFTS = False
+CUTOFFBYDICTMATCH = True
+AVG_LENGTH = 5
 PERCENT = 0.3
 DECIDEFUNCTION = 0
 # 0 - most dictionary matches
@@ -111,6 +113,24 @@ def checkCase(letter):
         return "number"
     else:
         return None
+
+# function to determine cutoff point for word matches for early output
+def checkThreshold(posPlain, wordCount):
+    
+    threshold = len(posPlain.split())//AVG_LENGTH
+    expectedWords = math.floor(len(posPlain.split()) * PERCENT)
+
+    if wordCount > expectedWords:
+        return True
+    return False
+                           
+##    for word in posPlain.split():
+##        if len(word) > threshold:
+##            if word in miniDict:
+##                count += 1
+##            if count > expectedWords:
+##                return True
+##    return False
 
 # function that runs appropriate 'best plain text' function
 #  ~ all current functions look for the plaintext with the most of something
@@ -191,7 +211,7 @@ def bestPlainT(text, simple):
 ##                                      # ex: 3rd most word matches,
 ##                                      #  2nd most words at beginning of new line, etc. 
 
-    # would put IDEA here
+    # would put IDEA (all possible alphabets) here
 
     # find number of (real words, the's, etc.)
     #  using each possible word in dictionary
@@ -211,6 +231,8 @@ def bestPlainT(text, simple):
             wordCount = decide(DECIDEFUNCTION,posPlain)
             wordCounts.append(wordCount)
             words.append(word)
+            if CUTOFFBYDICTMATCH and checkThreshold(posPlain, wordCounts[-1]):
+                return [getPlainT(text,modifyLen(word, text),False),word]
 
     # get the index of the most likely plain text
     bestKeyWords = max(wordCounts)
@@ -228,16 +250,6 @@ def bestPlainT(text, simple):
     #  (most likely plaintext & the alphabet shift used to obtain it)
     return [getPlainT(text, modifyLen(bestKey,text), False), bestKey]
 
-    ##########
-    # IDEA
-    ##########
-    #
-    #   We could try using all possible alphabets and returning
-    #       the most likely plain text of them all.
-    #   At the moment, it will add too much time to texts like 01c or 01d
-
-    # iterate through all possible shifts and use
-    #  most likely plaintext decision criteria
             
 
 # function to count the words in text
