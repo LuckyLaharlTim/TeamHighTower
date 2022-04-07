@@ -23,7 +23,6 @@
 ##################################
 
 
-##  TO-DO: implement percent checks for plain text, decode c-e with program to ensure it's working completely
 
 import sys # import sys for standard input from command line
 import math
@@ -43,6 +42,7 @@ p = 389
 q = 683
 SEPARATED_BY = "," # often "," or "\n"
 CUTOFFBYDICTMATCH = True
+longSearch = True # <- will stop as soon as we find a decent plainText
 AVG_LENGTH = 5
 PERCENT = 0.3
 MIN_PRIME = 100
@@ -137,15 +137,39 @@ def getPrimes(MIN_PRIME, MAX_PRIME):
 
 
 # generates all e's and randomly returns one
-def genEs(z):
-	es = []
+def genEs(z, p, q):
+    es = [3,5,17,257,65537]
+    for e in es:
+        if e > z:
+            es.remove(e)
+    
+    # put in special primes as first 'e' value we test
+    # (remove them if they are greater than the z we use)
 
-	for e in range(3, z, 2):
-		if (isPrime(e) and gcd(z, e) == 1):
-			es.append(e)
+    # source for ideas to speed up finding e:
+    #   https://crypto.stackexchange.com/questions/13166/method-to-calculating-e-in-rsa
 
-	return es
+    for e in range(max(p,q), z, 2):
+        if (isPrime(e) and gcd(z, e) == 1 and e not in es):
+            es.append(e) 
 
+    return es
+
+# calculates the inverse modulo of e and z
+# grabbed from here: https://www.packetmania.net/en/2022/01/22/Python-Textbook-RSA/
+def extgcd(e,z):
+        old_s, s = 1, 0
+        old_t, t = 0,1
+
+        while z:
+            x = e // z
+            s, old_s = old_s - x * s, s
+            t, old_t = old_t - x * t, t
+            e,z = z, e%z
+        return e, old_s, old_t
+
+
+    
 # naively calculates the inverse modulo of e and z
 def naiveInverse(e, z):
 	d = 0
@@ -155,22 +179,29 @@ def naiveInverse(e, z):
 			return d
 		d += 1
 
+# shoulde find mod inverse using Extended Eucliedean Algorithm
+# also grabbed from here: https://www.packetmania.net/en/2022/01/22/Python-Textbook-RSA/
+def EucModInv(e,z):
+
+    g,x,y = extgcd(e,z)
+    try:
+        assert g == 1
+
+        if x < 0:
+            x += z
+        return x
+    except AssertionError:
+        return naiveInverse(e,z)
+
 def factor(num):
 
     for i in range(3, int(num ** 0.5 + 1), 2):
         if num % i == 0 :
             if isPrime(i) and isPrime(num/i):
                 # I guess there will only be one set of prime factors
-                print(f"{int(i)}, {int(num/i)}")
                 return int(i), int(num/i)
-'''
-# calculates the inverse modulo of e and z
-def EuclideanInverse(e,z):
-        if e == 0:
-                return z, 0, 1
 
-        gcd, s1, t1 = EuclideanInverse
-'''
+
 # encrypts a message M with a public key K_pub to get C
 def encrypt(M, K_pub):
 	return (M ** K_pub[0]) % K_pub[1]
@@ -267,11 +298,6 @@ def getPlainT(text, key, testing):
         else:
             plain += text[i]
     return plain
-
-# making text
-def toText(char):
-
-    return getChar(char % letterSize)
           
 
 # function to count the words in text
@@ -317,24 +343,23 @@ def countLets(posPlain, alpha):
 #  or simply decrypting with a stated shift
 def process(message):
 
-    outputString = ""
-
     ########
     ## SETUP
     ########
 
-    # get public key from first line if first line is a tuple
+    
     if message[0][0] == "(":
         tup = message[0].split(",")
         e = int(tup[0][1:])
         n = int(tup[1][:-1])
-        K_pub = (e,n)
     # otherwise, take first line as 'n' alone
     elif int(message[0]) == 0:
         pass
     else:
-        print(f"n is {message[0]}")
+        if "-c" in sys.argv:
+            e = int(sys.argv[sys.argv.index("-c")+1])
         n = int(message[0])
+    message = message[1:]
 
     # if we already have n (we should), find p and q  
     try:
@@ -356,13 +381,17 @@ def process(message):
     try:
         es = [e]
     except NameError:
-        es = genEs(z)
+        es = genEs(z,p,q)
+        if "-e" in sys.argv:
+            es = [int(sys.argv[sys.argv.index("-e")+1])]
+            #es = [choice(es)]
+            cipherText = f"{n}\n"
     
 
     
 
     ########
-    ## END SETUP
+    ## END SETUP, START LOOKING 
     ########
 
     outputStr = ""
@@ -372,11 +401,12 @@ def process(message):
 
         sys.stdout.write("--\n")
         e = es[i]
-        #es.remove(e)
         sys.stdout.write("Trying e={}\n".format(e))
 
         # calculate d
-        d = naiveInverse(e, z)
+        d = EucModInv(e,z) # d = naiveInverse(e, z)
+        if(d==None):
+            continue
         sys.stdout.write("d={}\n".format(d))
 
         # generate the public and private keys
@@ -386,79 +416,48 @@ def process(message):
         sys.stdout.write("Private key: {}\n".format(K_priv))
         
         for m in message:
-            
-            if not(m[0] == "("):
-                #outputStr += "--\n"
+                
+            if "-e" in sys.argv:
+                m = ord(m)
+            else:
                 m = int(m)
 
-                # no need to mess with alphabet
-                # Message uses ASCII
-                outputStr += chr(decrypt(m, K_priv) % 128)
+            # no need to mess with alphabet
+            # Message uses ASCII
+            if "-e" in sys.argv:
+                cipherText += str(encrypt(m, K_pub))+","
+            else:
+                outputStr += chr(decrypt(m, K_priv))           
 
-                # code from example
-                '''
-                C = encrypt(m, K_pub)
-                outputStr += "M={}\n".format(m)
-                outputStr += "C={}\n".format(C)
-                m = decrypt(C, K_priv)
-                outputStr += "M={}\n".format(m)
-                '''
-            
-
+        outputStr += "\n"
+        
         try:
-##            for char in outputStr:
-##                if ord(char) < 32:
-##                    sys.stdout.write("ERROR: invalid plaintext.\n")
-##                    break
-##                else:
-##                    sys.stdout.write(outputStr)
-##                    break
-            if (countThe(outputStr) > 1):
+            #write decrypted text if it has a sizable number of words
+            if "-c" in sys.argv:
                 sys.stdout.write(outputStr)
-                # when you only get the proper plaintext
-                break
+            elif "-e" in sys.argv:
+                sys.stdout.write(cipherText)
+            elif decide(0,outputStr) > len(outputStr.split()) * PERCENT:
+                sys.stdout.write(outputStr)
+                if longSearch:
+                    plainText = outputStr
             else:
                 sys.stdout.write("ERROR: invalid plaintext.\n")
-            
         except UnicodeEncodeError:
                 sys.stdout.write("ERROR: invalid plaintext.\n")
+                
         outputStr = ""
-        
-        
-'''
-    # decrypting with intent to find most likely plaintext
-    if (len(sys.argv) < 2) or (sys.argv[1] not in ["-e","-c"]):
-        # check if we want to use non-optimal search criteria (2nd best, etc.)
-        if len(sys.argv) > 1:
-            simple = False
-        else:
-            simple = True
-        outputList = bestPlainT(text, simple)
-        outputString += f"KEY={outputList[1]}:\n"
-        outputString += outputList[0]
 
-    # encrypting block (same as getPlainT(ciphertext), but + SHIFT instead
-    elif sys.argv[1] == "-e":
-        KEY = sys.argv[2]
-        KEY = modifyLen(KEY, text)
-        keyIndex = 0
-        for i in range(0,len(text)):
-            # plaintext character is in alphabet (list/string 'alpha')
-            if text[i] in alpha:
-                encodedChar = getChar(((getOrdinal(text[i]) + getOrdinal(key[keyIndex])) % letterSize))
-                outputString += encodedChar
-                keyIndex += 1
-            # plaintext character is anything else, just repeat the character
-            else:
-                outputString += text[i]       
+        if longSearch:
+            try:
+                len(plainText) > 5
+                break
+            except NameError:
+                continue
+        
 
-    # if you want a decode using a specific shift and not most likely
-    elif sys.argv[1] == "-c":
-        KEY = sys.argv[2]
-        KEY = modifyLen(KEY, text)
-        outputString += f"KEY={sys.argv[2]}:\n"+getPlainT(text,KEY,False)
-               
-'''
+##    if longSearch:
+##        sys.stdout.write(f"REMINDER:\ne = {e}\nplaintext=\n{plainText}")
 
 ########
 ### MAIN
