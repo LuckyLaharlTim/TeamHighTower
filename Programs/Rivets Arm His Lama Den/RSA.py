@@ -8,18 +8,25 @@
 ##################################
 # Manual
 #
-# python(3) <fileName>.py < input > output
+# python(3) <fileName>.py <flags> <e> < input > output
 #
 # Flags:
-# no flags at the moment
+# no flag | will decrypt input using all possible e's until a readable on is obtained,
+#            initially knowing only the n value;
+#            will use Fermat's numbers as e value first
 #
+# -c | will decrypt input using the specified e in command line;
+#       output generated regardless of readability
+#
+# -e | in progress; should encode readable text into int values with n first
+#       uses given e value for public and private keys
 #
 # NOTE: Currently, the dictionary (or possible dictionaries)
 #           MUST be in the same directory as this file
 #       
 # NOTE2: The program currently takes in input correctly
 #        (and decodes correctly if given both e & n -- public key);
-#        Unsure if it can find the correct plaintext blind though
+#        Unsure if it can quickly find the correct plaintext blind though
 ##################################
 
 
@@ -456,8 +463,7 @@ def process(message):
                 continue
         
 
-##    if longSearch:
-##        sys.stdout.write(f"REMINDER:\ne = {e}\nplaintext=\n{plainText}")
+
 
 ########
 ### MAIN
