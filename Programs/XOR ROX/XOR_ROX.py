@@ -41,48 +41,49 @@ DEBUGTIME = True
 
 # the image variables
 KEY_FILE = "05-key.txt"
-INPUT_IMAGE = "input.png"
+INPUT_IMAGE = "05-xor.png"#"input.png"
 AND_IMAGE = "and-"+INPUT_IMAGE
 OR_IMAGE = "or-"+INPUT_IMAGE
 XOR_IMAGE = "xor-"+INPUT_IMAGE
-KEY_PIXELS = []
-img = None
-pixels = None
-Opixels = []
-rows = cols = 0
+img = Image.open(INPUT_IMAGE)
+img2 = Image.open(INPUT_IMAGE)
+pixels = img.load()
+Opixels = img2.load()
+rows, cols = img.size
 
 def setKey():
+
+    KEY_PIXELS = [[0]*cols]*rows
     # fills KEY_PIXELS
     f = open(KEY_FILE)
 ##    pixelRow = 0
 ##    pixelCol = 0
     line = f.readline().strip()
-    while not (line == None):
-        line = line.split(",")
-        KEY_PIXELS.append((int(line[0]), int(line[1]), int(line[2])))
-        line = f.readline().strip()
-    f.close()
-        
-
-def getImage():
-    # get the input image
-    img = Image.open(INPUT_IMAGE)
-    pixels = img.load()
-    for val in pixels:
-        Opixels.append(val)
-    rows, cols = img.size
-
-
-def buildAND():
-    
     for row in range(rows):
         for col in range(cols):
-            Or,Og,Ob = Opixels[row][col]
+            line = line.split(",")
+            KEY_PIXELS[row][col] = int(line[0]), int(line[1]), int(line[2])
+            line = f.readline().strip()
+            
+##    while not (line == None):
+##        line = line.split(",")
+##        KEY_PIXELS.append((int(line[0]), int(line[1]), int(line[2])))
+##        line = f.readline().strip()
+    f.close()
+    return KEY_PIXELS
+
+KEY_PIXELS = setKey()      
+
+def buildAND():
+        
+    for row in range(rows):
+        for col in range(cols):
+            Or,Og,Ob = Opixels[row,col]
             Kr,Kg,Kb = KEY_PIXELS[row][col]
             r = Or & Kr
             g = Og & Kg
             b = Ob & Kb
-            pixels[row][col] = r,g,b
+            pixels[row,col] = r,g,b
 
     # write the new image
     img.save(AND_IMAGE)
@@ -91,12 +92,12 @@ def buildOR():
     
     for row in range(rows):
         for col in range(cols):
-            Or,Og,Ob = Opixels[row][col]
+            Or,Og,Ob = Opixels[row,col]
             Kr,Kg,Kb = KEY_PIXELS[row][col]
             r = Or | Kr
             g = Og | Kg
             b = Ob | Kb
-            pixels[row][col] = r,g,b
+            pixels[row,col] = r,g,b
 
     # write the new image
     img.save(OR_IMAGE)
@@ -105,12 +106,12 @@ def buildXOR():
     
     for row in range(rows):
         for col in range(cols):
-            Or,Og,Ob = Opixels[row][col]
+            Or,Og,Ob = Opixels[row,col]
             Kr,Kg,Kb = KEY_PIXELS[row][col]
             r = Or ^ Kr
             g = Og ^ Kg
             b = Ob ^ Kb
-            pixels[row][col] = r,g,b
+            pixels[row,col] = r,g,b
 
     # write the new image
     img.save(XOR_IMAGE)
@@ -124,12 +125,9 @@ def buildXOR():
 if __name__ == "__main__":
     if DEBUGTIME:
         t0 = time()
-    getImage()
 
-    setKey()
-
-    buildAND()
-    buildOR()
+    #buildAND()
+    #buildOR()
     buildXOR()
     
     if DEBUGTIME:
