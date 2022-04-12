@@ -1,17 +1,17 @@
 ###########################################################################################
 # Name: Megan Cox
 # Date: 4/10/19
-# Description: Room Adventure
+# Description: floor Adventure
 ###########################################################################################
 from Tkinter import *
 
-# the room class
+# the floor class
 # note that this class is fully implemented with dictionaries as illustrated in the lesson "More on Data Structures"
-class Room(object):
+class Floor(object):
     # the constructor
     def __init__(self, name, image):
-        # rooms have a name, an image (the name of a file), exits (e.g., south), exit locations
-        # (e.g., to the south is room n), items (e.g., table), item descriptions (for each item),
+        # floors have a name, an image (the name of a file), exits (e.g., south), exit locations
+        # (e.g., to the south is floor n), items (e.g., table), item descriptions (for each item),
         # and grabbables (things that can be taken into inventory)
         self.name = name
         self.image = image
@@ -59,37 +59,37 @@ class Room(object):
     def grabbables(self, value):
         self._grabbables = value
 
-  # adds an exit to the room
+  # adds an exit to the floor
   # the exit is a string (e.g., north)
-  # the room is an instance of a room
-    def addExit(self, exit, room):
-        # append the exit and room to the appropriate dictionary
-        self._exits[exit] = room
+  # the floor is an instance of a floor
+    def addExit(self, exit, floor):
+        # append the exit and floor to the appropriate dictionary
+        self._exits[exit] = floor
 
-  # adds an item to the room
+  # adds an item to the floor
   # the item is a string (e.g., table)
   # the desc is a string that describes the item (e.g., it is made of wood)
     def addItem(self, item, desc):
         # append the item and description to the appropriate dictionary
         self._items[item] = desc
 
-  # adds a grabbable item to the room
+  # adds a grabbable item to the floor
   # the item is a string (e.g., key)
     def addGrabbable(self, item):
         # append the item to the list
         self._grabbables.append(item)
 
-  # removes a grabbable item from the room
+  # removes a grabbable item from the floor
   # the item is a string (e.g., key)
     def delGrabbable(self, item):
         # remove the item from the list
         self._grabbables.remove(item)
 
-  # returns a string description of the room
+  # returns a string description of the floor
     def __str__(self):
-       # first, the room name
+       # first, the floor name
        s = "You are in {}.\n".format(self.name)
-       # next, the items in the room
+       # next, the items in the floor
        s += "You see: "
        for item in self.items.keys():
            s += item + " "
@@ -101,7 +101,7 @@ class Room(object):
            s += grabbable + " "
            s += "\n"
 
-        # next, the exits from the room
+        # next, the exits from the floor
            s += "Exits: "
        for exit in self.exits.keys():
            s += exit + " "
@@ -117,54 +117,36 @@ class Game(Frame):
         # call the constructor in the superclass
         Frame.__init__(self, parent)
 
-    # creates the rooms
-    def createRooms(self):
-        # create the rooms and give them meaningful names
-        r1 = Room("Room 1", "room1.gif")
-        r2 = Room("Room 2", "room2.gif")
-        r3 = Room("Room 3", "room3.gif")
-        r4 = Room("Room 4", "room4.gif")
+    # creates the floors
+    def createFloors(self):
+        # create the floors and give them meaningful names
+        r1 = Floor("Floor 1", "room1.gif")
+        r2 = Floor("Floor 2", "room2.gif")
+        r3 = Floor("Floor 3", "room3.gif")
+        r4 = Floor("Finish", "room4.gif")
 
-        # add exits to room 1
-        r1.addExit("east", r2) # -> to the east of room 1 is room 2
-        r1.addExit("south", r3)
+        # add exits to floor 1
+        r1.addExit("key1", r2) # -> to the east of floor 1 is floor 2
 
-            # add grabbables to room 1
-        r1.addGrabbable("key")
-
-        # add items to room 1
+        # add items to floor 1
         r1.addItem("chair", "It is made of wicker and no one is sitting on it.")
         r1.addItem("table", "It is made of oak. A golden key rests on it.")
 
-        # add exits to room 2
-        r2.addExit("west", r1)
-        r2.addExit("south", r4)
+        # add exits to floor 2
+        r2.addExit("key2", r3)
 
-        # add items to room 2
+        # add items to floor 2
         r2.addItem("rug", "It is nice and Indian. It also needs to be vacuumed.")
         r2.addItem("fireplace", "It is full of ashes.")
 
-        # add exits to room 3
-        r3.addExit("north", r1)
-        r3.addExit("east", r4)
+        # add exits to floor 3
+        r3.addExit("key3", r4)
 
-        # add grabbables to room 3
+        # add grabbables to floor 3
         r3.addGrabbable("book")
-        r3.addGrabbable("ladder")
 
-        # add exits to room 4
-        r4.addExit("north", r2)
-        r4.addExit("west", r3)
-        r4.addExit("south", None) # DEATH!
-
-        # add grabbables to room 4
-        r4.addGrabbable("6-pack")
-
-        # add items to room 4
-        r4.addItem("brew_rig", "Gourd is brewing some sort of oatmeal stout on the brew rig. A 6-pack is resting beside it.")
-
-        # set room 1 as the current room at the beginning of the game
-        Game.currentRoom = r1
+        # set floor 1 as the current floor at the beginning of the game
+        Game.currentFloor = r1
         Game.inventory = []  # makes the inventory empty
 
 
@@ -191,12 +173,12 @@ class Game(Frame):
         text_frame.pack(side=RIGHT, fill=Y)
         text_frame.pack_propagate(False)
 
-  # sets the current room image
-    def setRoomImage(self):
-        if (Game.currentRoom == None):
+  # sets the current floor image
+    def setFloorImage(self):
+        if (Game.currentFloor == None):
             Game.img = PhotoImage(file = "skull.gif")
         else:
-            Game.img = PhotoImage(file = Game.currentRoom.image)
+            Game.img = PhotoImage(file = Game.currentFloor.image)
 
         Game.image.config(image = Game.img)
         Game.image.image = Game.img
@@ -206,10 +188,10 @@ class Game(Frame):
         Game.text.config(state = NORMAL)
         Game.text.delete("1.0", END)
 
-        if (Game.currentRoom == None):
+        if (Game.currentFloor == None):
                 Game.text.insert(END, "You died!")
         else:
-                Game.text.insert(END, str(Game.currentRoom) +\
+                Game.text.insert(END, str(Game.currentFloor) +\
                                  "\n You are carrying: "+ str(Game.inventory) +\
                                  "\n\n" + status)
 
@@ -217,12 +199,12 @@ class Game(Frame):
 
   # plays the game
     def play(self):
-        # add the rooms to the game
-        self.createRooms()
+        # add the floors to the game
+        self.createFloors()
         # configure the GUI
         self.setupGUI()
-        # set the current room
-        self.setRoomImage()
+        # set the current floor
+        self.setFloorImage()
         # set the current status
         self.setStatus("")
 
@@ -235,7 +217,7 @@ class Game(Frame):
         if (action == "quit" or action == "bye"):
             exit(0)
 
-        if (Game.currentRoom == None):
+        if (Game.currentFloor == None):
             game.player_input.delete(0, END)
             return
 
@@ -247,29 +229,29 @@ class Game(Frame):
             if (verb == "go"):
                 response = "INVALID EXIT"
 
-                if (noun in Game.currentRoom.exits):
-                    Game.currentRoom = Game.currentRoom.exits[noun]
-                    response = "Room Changed"
+                if (noun in Game.currentFloor.exits):
+                    Game.currentFloor = Game.currentFloor.exits[noun]
+                    response = "Floor Changed"
 
             elif (verb == "look"):
                 response = "I don't see anything"
 
-                if (noun in Game.currentRoom.items):
-                    response = Game.currentRoom.items[noun]
+                if (noun in Game.currentFloor.items):
+                    response = Game.currentFloor.items[noun]
 
             elif (verb == "take"):
                 response = "I can't take anything"
 
-                for grabbable in Game.currentRoom.grabbables:
+                for grabbable in Game.currentFloor.grabbables:
                     if (noun == grabbable):
                         Game.inventory.append(grabbable)
-                        Game.currentRoom.delGrabbable(grabbable)
+                        Game.currentFloor.delGrabbable(grabbable)
 
                         response = "Item Grabbed"
                         break
 
         self.setStatus(response)
-        self.setRoomImage()
+        self.setFloorImage()
         Game.player_input.delete(0, END)
 
 ##########################################################
@@ -279,7 +261,7 @@ HEIGHT = 600
 
 # create the window
 window = Tk()
-window.title("Room Adventure")
+window.title("Extreme Wyly Tower Escape")
 
 # create the GUI as a Tkinter canvas inside the window
 g = Game(window)
