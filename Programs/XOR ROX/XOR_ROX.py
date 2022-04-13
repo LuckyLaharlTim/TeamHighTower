@@ -8,25 +8,23 @@
 ##################################
 # Manual
 #
-# python(3) <fileName>.py <flags> <e> < input > output
+# python(3) <fileName>.py <flag(s)> < input > output
 #
 # Flags:
-# no flag | will decrypt input using all possible e's until a readable on is obtained,
-#            initially knowing only the n value;
-#            will use Fermat's numbers as e value first
+# no flag | will create AND, OR, & XOR versions of the INPUT_IMAGE in the current directory
 #
-# -c | will decrypt input using the specified e in command line;
-#       output generated regardless of readability
+# -a | will create an AND version of the INPUT_IMAGE in the current directory       
 #
-# -e | in progress; should encode readable text into int values with n first
-#       uses given e value for public and private keys
-#
-# NOTE: Currently, the dictionary (or possible dictionaries)
-#           MUST be in the same directory as this file
+# -o | will create an OR version of the INPUT_IMAGE in the current directory
 #       
-# NOTE2: The program currently takes in input correctly
-#        (and decodes correctly if given both e & n -- public key);
-#        Unsure if it can quickly find the correct plaintext blind though
+# -x | will create an XOR version of the INPUT_IMAGE in the current directory 
+#
+# NOTE: flags can be used together
+#       
+# NOTE2: The program currently achieves its objective,
+#         but results differ from files like '05-or.png' received from Digilormo
+#         (also XORing a xor output is the same visually,
+#         but is larger in size than original)
 ##################################
 
 import sys # import sys for standard input from command line
@@ -41,23 +39,22 @@ DEBUGTIME = True
 
 # the image variables
 KEY_FILE = "05-key.txt"
-INPUT_IMAGE = "05-xor.png"#"input.png"
+INPUT_IMAGE = "input.png"#"input.png"
 AND_IMAGE = "and-"+INPUT_IMAGE
 OR_IMAGE = "or-"+INPUT_IMAGE
 XOR_IMAGE = "xor-"+INPUT_IMAGE
 img = Image.open(INPUT_IMAGE)
-img2 = Image.open(INPUT_IMAGE)
-pixels = img.load()
-Opixels = img2.load()
+pixels = Opixels = img.load()
 rows, cols = img.size
+# print(f"there are {rows*cols} pixels")
 
 def setKey():
 
     KEY_PIXELS = [[0]*cols]*rows
+    # print(f"there are {len(KEY_PIXELS)*len(KEY_PIXELS[0])} pixels in KEY_PIXELS")
     # fills KEY_PIXELS
     f = open(KEY_FILE)
-##    pixelRow = 0
-##    pixelCol = 0
+
     line = f.readline().strip()
     for row in range(rows):
         for col in range(cols):
@@ -65,10 +62,7 @@ def setKey():
             KEY_PIXELS[row][col] = int(line[0]), int(line[1]), int(line[2])
             line = f.readline().strip()
             
-##    while not (line == None):
-##        line = line.split(",")
-##        KEY_PIXELS.append((int(line[0]), int(line[1]), int(line[2])))
-##        line = f.readline().strip()
+
     f.close()
     return KEY_PIXELS
 
@@ -126,9 +120,12 @@ if __name__ == "__main__":
     if DEBUGTIME:
         t0 = time()
 
-    #buildAND()
-    #buildOR()
-    buildXOR()
+    if (("-a" in sys.argv) or (len(sys.argv) < 2)):
+        buildAND()
+    if (("-o" in sys.argv) or (len(sys.argv) < 2)):
+        buildOR()
+    if (("-x" in sys.argv) or (len(sys.argv) < 2)):
+        buildXOR()
     
     if DEBUGTIME:
         t1= time()
