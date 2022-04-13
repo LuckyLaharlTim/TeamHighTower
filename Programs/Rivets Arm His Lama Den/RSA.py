@@ -8,22 +8,28 @@
 ##################################
 # Manual
 #
-# python(3) <fileName>.py < input > output
+# python(3) <fileName>.py <flags> <e> < input > output
 #
 # Flags:
-# no flags at the moment
+# no flag | will decrypt input using all possible e's until a readable on is obtained,
+#            initially knowing only the n value;
+#            will use Fermat's numbers as e value first
 #
+# -c | will decrypt input using the specified e in command line;
+#       output generated regardless of readability
+#
+# -e | in progress; should encode readable text into int values with n first
+#       uses given e value for public and private keys
 #
 # NOTE: Currently, the dictionary (or possible dictionaries)
 #           MUST be in the same directory as this file
 #       
 # NOTE2: The program currently takes in input correctly
 #        (and decodes correctly if given both e & n -- public key);
-#        Unsure if it can find the correct plaintext blind though
+#        Unsure if it can quickly find the correct plaintext blind though
 ##################################
 
 
-##  TO-DO: implement percent checks for plain text, decode c-e with program to ensure it's working completely
 
 import sys # import sys for standard input from command line
 import math
@@ -43,6 +49,7 @@ p = 389
 q = 683
 SEPARATED_BY = "," # often "," or "\n"
 CUTOFFBYDICTMATCH = True
+longSearch = True # <- will stop as soon as we find a decent plainText
 AVG_LENGTH = 5
 PERCENT = 0.3
 MIN_PRIME = 100
@@ -51,44 +58,13 @@ DECIDEFUNCTION = 0
 # 0 - most dictionary matches
 # 1 - most occurences of word 'the'
 
-## given alphabet strings
-alph1 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-alph2 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-
-alph3 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$%^&*()-_=+[{]}\|;:'\",<.>/? "
-
-alph4 = " -,;:!?/.'"+'"()[]$&#%012345789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxyYzZ'
-
-alph5 = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_:./@#$%&*"
-
-alph6 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$%^&*()-_=+[{]}\|;:'\",<.>/? "
-
-alphTable = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_:./@#$%&*"
-
-
-# additional alphabets from challenges and such
-alph6 = "ABCDEFGHIJ012345abcdefghijklmKLMNOPQRS67nopqrstuvTUVWXYZwxyz89"
-
-alph7 = "ABCDEFGHIJ012345abcdedfhijklmnopKLMNOPQRS67qrstuvwxyTUVWXYZ89z"
-
 #######################
 ## Variables to Change!
 #######################
 
-alphaCandidate = alph4 # <--- CHANGE IF NEEDED
 filename = "dictionary-01.txt" # <--- CHANGE IF NEEDED
-# keyStartsWith should have strings (or chars) of letters
 
 ##################################################
-
-# store characters as elements of list 'alpha'
-def makeAlpha():
-    alpha = []
-    for char in alphaCandidate:
-        alpha.append(char)
-    letterSize = len(alpha) # size of the alphabet # currently (26 letters)*2 cases + 10 characters + 10 numbers
-    return alpha, letterSize
 
 # go through dictionary file and find possible words
 def fillDict():
@@ -99,8 +75,7 @@ def fillDict():
     f.close()
     return mDict
 
-# get alphabet & referencable dictionary
-alpha, letterSize = makeAlpha()
+# get referencable dictionary
 miniDict = fillDict()
 
 ###########################
@@ -137,15 +112,44 @@ def getPrimes(MIN_PRIME, MAX_PRIME):
 
 
 # generates all e's and randomly returns one
-def genEs(z):
-	es = []
+def genEs(z, p, q):
+    es = [3,5,17,257,65537]
+    for e in es:
+        if e > z:
+            es.remove(e)
+    
+    # put in special primes as first 'e' value we test
+    # (remove them if they are greater than the z we use)
 
-	for e in range(3, z, 2):
-		if (isPrime(e) and gcd(z, e) == 1):
-			es.append(e)
+    # source for ideas to speed up finding e:
+    #   https://crypto.stackexchange.com/questions/13166/method-to-calculating-e-in-rsa
 
-	return es
+    for e in range(max(p,q), z, 2):
+        if (isPrime(e) and gcd(z, e) == 1 and e not in es):
+            es.append(e)
 
+    # in case e is one of those earlier possibilities
+    for e in range(7, max(p,q), 2):
+        if (isPrime(e) and gcd(z, e) == 1 and e not in es):
+            es.append(e) 
+
+    return es
+
+# calculates the inverse modulo of e and z
+# grabbed from here: https://www.packetmania.net/en/2022/01/22/Python-Textbook-RSA/
+def extgcd(e,z):
+        old_s, s = 1, 0
+        old_t, t = 0,1
+
+        while z:
+            x = e // z
+            s, old_s = old_s - x * s, s
+            t, old_t = old_t - x * t, t
+            e,z = z, e%z
+        return e, old_s, old_t
+
+
+    
 # naively calculates the inverse modulo of e and z
 def naiveInverse(e, z):
 	d = 0
@@ -155,22 +159,29 @@ def naiveInverse(e, z):
 			return d
 		d += 1
 
+# shoulde find mod inverse using Extended Eucliedean Algorithm
+# also grabbed from here: https://www.packetmania.net/en/2022/01/22/Python-Textbook-RSA/
+def EucModInv(e,z):
+
+    g,x,y = extgcd(e,z)
+    try:
+        assert g == 1
+
+        if x < 0:
+            x += z
+        return x
+    except AssertionError:
+        return naiveInverse(e,z)
+
 def factor(num):
 
     for i in range(3, int(num ** 0.5 + 1), 2):
         if num % i == 0 :
             if isPrime(i) and isPrime(num/i):
                 # I guess there will only be one set of prime factors
-                print(f"{int(i)}, {int(num/i)}")
                 return int(i), int(num/i)
-'''
-# calculates the inverse modulo of e and z
-def EuclideanInverse(e,z):
-        if e == 0:
-                return z, 0, 1
 
-        gcd, s1, t1 = EuclideanInverse
-'''
+
 # encrypts a message M with a public key K_pub to get C
 def encrypt(M, K_pub):
 	return (M ** K_pub[0]) % K_pub[1]
@@ -216,63 +227,12 @@ def decide(func, a):
 
 # returns position in alpha list for given character
 def getOrdinal(letter):
-    return alpha.index(letter)
+    return ord(letter)
 
 # returns character in alpha list for given index
 def getChar(num):
-    return alpha[num]
-
-# make length of x equal to length of y by repeating x
-def modifyLen(x,y):
-    # check if the x value is a string instead of a list
-    #  so we can use 'append'
-    xList = []
-    for char in x:
-        if char in alpha:
-            xList.append(char)
-    x = xList
-
-    i = 0   
-    while len(y)>len(x):
-        x.append(x[i])
-        i+=1
-
-    return x
-
-# conducts shift of alphabet by given SHIFT positions for each character to cipher text
-#  encryption just has the inverse of this in process(message)
-def getPlainT(text, key, testing):
-    plain = ""
-    keyIndex = 0 # if needed
-
-    # shorten ciphertext to shorten the amount of time we
-    #  spend making our decision on best plaintext
-    if testing:
-        mText = []
-        limit = math.floor(len(text) * PERCENT)
-        for i in range(limit):
-            mText.append(text[i])
-        text = mText
-    
-    # for every character . . .
-    for i in range(0,len(text)):
-        # plaintext character is in alphabet (list/string 'alpha')
-        if text[i] in alpha:
-            # subtract the key from the character's position in alphabet
-            #  and mod by the alphabet size (for negative numbers)
-            encodedChar = getChar((getOrdinal(text[i]) - getOrdinal(key[keyIndex])) % letterSize)
-            plain += encodedChar
-            keyIndex += 1
-        # plaintext character is anything else, just repeat the character
-        else:
-            plain += text[i]
-    return plain
-
-# making text
-def toText(char):
-
-    return getChar(char % letterSize)
-          
+    return chr(num)
+         
 
 # function to count the words in text
 #  that are also in specified dictionary
@@ -313,29 +273,135 @@ def countLets(posPlain, alpha):
     return lets
 #####################################
 
+## build ciphertext using readable input characters
+def makeCipher(e,n,p,q,z,message):
+    outputStr = ""
+    K_pub = (e, n)
+
+    for m in message:
+        m = ord(m)
+
+        # no need to mess with alphabet
+        # Message uses ASCII
+        outputStr += str(encrypt(m, K_pub))+","         
+
+    outputStr = outputStr[:-1] # get rid of last comma
+    sys.stdout.write(f"{n}\n{outputStr}")
+
+## given a public key, decrypt input numbers to plaintext
+def getPlainE(e,n,p,q,z,message):
+    outputStr = ""
+
+    sys.stdout.write("--\n")
+    sys.stdout.write("Trying e={}\n".format(e))
+
+    # calculate d
+    d = EucModInv(e,z)
+    sys.stdout.write("d={}\n".format(d))
+
+    # generate the public and private keys
+    K_pub = (e, n)
+    K_priv = (d, n)
+    sys.stdout.write("Public key: {}\n".format(K_pub))
+    sys.stdout.write("Private key: {}\n".format(K_priv))
+    
+    for m in message:
+        m = int(m)
+
+        # no need to mess with alphabet
+        # Message uses ASCII
+        outputStr += chr(decrypt(m, K_priv))           
+
+    outputStr += "\n"
+    
+    try:
+        #write decrypted text if it has a sizable number of words
+        sys.stdout.write(outputStr)
+    except UnicodeEncodeError:
+        sys.stdout.write("ERROR: invalid plaintext.\n")
+
+## given only n, decrypt input numbers to plaintext
+def getPlain(n,p,q,z,message):
+    outputStr = ""
+
+    # get possible e's --change genEs() to modify what's tried first
+    es = genEs(z,p,q)
+
+    # implement RSA in the specified input Ms
+    for i in range(len(es)):
+
+        sys.stdout.write("--\n")
+        e = es[i]
+        sys.stdout.write("Trying e={}\n".format(e))
+
+        # calculate d
+        d = EucModInv(e,z)
+        if(d==None):
+            d = naiveInverse(e, z) # error with modified function to find ModInv
+            if(d==None):
+                sys.stdout.write(f"No modular inverse found for e = {e}\n")
+                continue # can just skip current e altogether instead
+        sys.stdout.write("d={}\n".format(d))
+
+        # generate the public and private keys
+        K_pub = (e, n)
+        K_priv = (d, n)
+        sys.stdout.write("Public key: {}\n".format(K_pub))
+        sys.stdout.write("Private key: {}\n".format(K_priv))
+        
+        for m in message:
+            m = int(m)
+
+            # no need to mess with alphabet
+            # Message uses ASCII
+            outputStr += chr(decrypt(m, K_priv))           
+
+        outputStr += "\n"
+        
+        try:
+            #write decrypted text if it has a sizable number of words
+            if decide(0,outputStr) > len(outputStr.split()) * PERCENT:
+                sys.stdout.write(outputStr)
+                if longSearch:
+                    plainText = outputStr
+            else:
+                sys.stdout.write("ERROR: invalid plaintext.\n")
+        except UnicodeEncodeError:
+                sys.stdout.write("ERROR: invalid plaintext.\n")
+                
+        outputStr = ""
+
+        if longSearch:
+            try:
+                len(plainText) > 5
+                break
+            except NameError:
+                continue
+    
+
 # function to process message (encrypting, decrypting most likely plaintext,
 #  or simply decrypting with a stated shift
 def process(message):
-
-    outputString = ""
 
     ########
     ## SETUP
     ########
 
-    # get public key from first line if first line is a tuple
+    
     if message[0][0] == "(":
         tup = message[0].split(",")
         e = int(tup[0][1:])
         n = int(tup[1][:-1])
-        K_pub = (e,n)
     # otherwise, take first line as 'n' alone
     elif int(message[0]) == 0:
         pass
     else:
-        print(f"n is {message[0]}")
+        if "-c" in sys.argv:
+            e = int(sys.argv[sys.argv.index("-c")+1])
         n = int(message[0])
+    message = message[1:]
 
+    
     # if we already have n (we should), find p and q  
     try:
         p,q = factor(n)
@@ -352,113 +418,20 @@ def process(message):
     z = int(((p - 1) * (q - 1)) / gcd(p - 1, q - 1))
     sys.stdout.write(f"z={z}\n")
 
-    # get the es and select an e
-    try:
-        es = [e]
-    except NameError:
-        es = genEs(z)
-    
-
-    
-
-    ########
-    ## END SETUP
-    ########
-
-    outputStr = ""
-
-    # implement RSA in the specified input Ms
-    for i in range(len(es)):
-
-        sys.stdout.write("--\n")
-        e = es[i]
-        #es.remove(e)
-        sys.stdout.write("Trying e={}\n".format(e))
-
-        # calculate d
-        d = naiveInverse(e, z)
-        sys.stdout.write("d={}\n".format(d))
-
-        # generate the public and private keys
-        K_pub = (e, n)
-        K_priv = (d, n)
-        sys.stdout.write("Public key: {}\n".format(K_pub))
-        sys.stdout.write("Private key: {}\n".format(K_priv))
-        
-        for m in message:
-            
-            if not(m[0] == "("):
-                #outputStr += "--\n"
-                m = int(m)
-
-                # no need to mess with alphabet
-                # Message uses ASCII
-                outputStr += chr(decrypt(m, K_priv) % 128)
-
-                # code from example
-                '''
-                C = encrypt(m, K_pub)
-                outputStr += "M={}\n".format(m)
-                outputStr += "C={}\n".format(C)
-                m = decrypt(C, K_priv)
-                outputStr += "M={}\n".format(m)
-                '''
-            
-
+    if "-e" in sys.argv:
+        str = ""
+        for val in message:
+            str += val
+        makeCipher(int(sys.argv[sys.argv.index("-e")+1]), n, p, q, z, str)
+    else:
         try:
-##            for char in outputStr:
-##                if ord(char) < 32:
-##                    sys.stdout.write("ERROR: invalid plaintext.\n")
-##                    break
-##                else:
-##                    sys.stdout.write(outputStr)
-##                    break
-            if (countThe(outputStr) > 1):
-                sys.stdout.write(outputStr)
-                # when you only get the proper plaintext
-                break
-            else:
-                sys.stdout.write("ERROR: invalid plaintext.\n")
-            
-        except UnicodeEncodeError:
-                sys.stdout.write("ERROR: invalid plaintext.\n")
-        outputStr = ""
-        
-        
-'''
-    # decrypting with intent to find most likely plaintext
-    if (len(sys.argv) < 2) or (sys.argv[1] not in ["-e","-c"]):
-        # check if we want to use non-optimal search criteria (2nd best, etc.)
-        if len(sys.argv) > 1:
-            simple = False
-        else:
-            simple = True
-        outputList = bestPlainT(text, simple)
-        outputString += f"KEY={outputList[1]}:\n"
-        outputString += outputList[0]
-
-    # encrypting block (same as getPlainT(ciphertext), but + SHIFT instead
-    elif sys.argv[1] == "-e":
-        KEY = sys.argv[2]
-        KEY = modifyLen(KEY, text)
-        keyIndex = 0
-        for i in range(0,len(text)):
-            # plaintext character is in alphabet (list/string 'alpha')
-            if text[i] in alpha:
-                encodedChar = getChar(((getOrdinal(text[i]) + getOrdinal(key[keyIndex])) % letterSize))
-                outputString += encodedChar
-                keyIndex += 1
-            # plaintext character is anything else, just repeat the character
-            else:
-                outputString += text[i]       
-
-    # if you want a decode using a specific shift and not most likely
-    elif sys.argv[1] == "-c":
-        KEY = sys.argv[2]
-        KEY = modifyLen(KEY, text)
-        outputString += f"KEY={sys.argv[2]}:\n"+getPlainT(text,KEY,False)
-               
-'''
+            getPlainE(e,n,p,q,z,message)
+        except:
+            getPlain(n,p,q,z,message)
+    
+    ########
+    ## END SETUP, START LOOKING 
+    ########
 
 ########
 ### MAIN
