@@ -36,15 +36,28 @@ from PIL import Image
 
 # variables for debug lines and extra things
 DEBUGTIME = True
+DEBUGMOREFILES = False
+showPixels = False
 
 # the image variables
 KEY_FILE = "05-key.txt"
 INPUT_IMAGE = "input.png"#"input.png"
-AND_IMAGE = "and-"+INPUT_IMAGE
-OR_IMAGE = "or-"+INPUT_IMAGE
-XOR_IMAGE = "xor-"+INPUT_IMAGE
+if DEBUGMOREFILES:
+    AND_IMAGE = "and-"+INPUT_IMAGE
+    OR_IMAGE = "or-"+INPUT_IMAGE
+    XOR_IMAGE = "xor-"+INPUT_IMAGE
+else:
+    AND_IMAGE = "and.png"
+    OR_IMAGE = "or.png"
+    XOR_IMAGE = "xor.png"
 img = Image.open(INPUT_IMAGE)
-pixels = Opixels = img.load()
+img2 = Image.open(INPUT_IMAGE)
+pixels = img.load()
+Opixels = img2.load()
+#sys.stdout.write(f"[{INPUT_IMAGE} is loaded]")
+##if showPixels:
+##    for val in pixels:
+##        sys.stdout.write(val)
 rows, cols = img.size
 # print(f"there are {rows*cols} pixels")
 
@@ -66,7 +79,12 @@ def setKey():
     f.close()
     return KEY_PIXELS
 
-KEY_PIXELS = setKey()      
+KEY_PIXELS = setKey()
+
+def writeKey():
+    for rowCol in KEY_PIXELS:
+        for pixel in KEY_PIXELS:
+            sys.stdout.write(f"{pixel[0]},{pixel[1]},{pixel[2]}")
 
 def buildAND():
         
@@ -82,6 +100,22 @@ def buildAND():
     # write the new image
     img.save(AND_IMAGE)
 
+'''
+def reverseAND():
+        
+    for row in range(rows):
+        for col in range(cols):
+            Or,Og,Ob = Opixels[row,col]
+            Kr,Kg,Kb = KEY_PIXELS[row][col]
+            r = ~Or | ~Kr
+            g = ~Og | ~Kg
+            b = ~Ob | ~Kb
+            pixels[row,col] = r,g,b
+
+    # write the new image
+    img.save("n" + AND_IMAGE)
+'''
+
 def buildOR():
     
     for row in range(rows):
@@ -95,6 +129,22 @@ def buildOR():
 
     # write the new image
     img.save(OR_IMAGE)
+
+'''
+def reverseOR():
+        
+    for row in range(rows):
+        for col in range(cols):
+            Or,Og,Ob = Opixels[row,col]
+            Kr,Kg,Kb = KEY_PIXELS[row][col]
+            r = ~Or & ~Kr
+            g = ~Og & ~Kg
+            b = ~Ob & ~Kb
+            pixels[row,col] = r,g,b
+
+    # write the new image
+    img.save("n" + OR_IMAGE)
+'''
 
 def buildXOR():
     
@@ -120,12 +170,30 @@ if __name__ == "__main__":
     if DEBUGTIME:
         t0 = time()
 
+##    outputS = "["
     if (("-a" in sys.argv) or (len(sys.argv) < 2)):
         buildAND()
+##        outputS += f"{AND_IMAGE},"
+    '''
+    if (("-rA" in sys.argv)):
+        reverseAND()
+##        outputS += f"n{AND_IMAGE},"
+    '''
     if (("-o" in sys.argv) or (len(sys.argv) < 2)):
         buildOR()
+##        outputS += f"{OR_IMAGE},"
+    '''
+    if (("-rO" in sys.argv)):
+        reverseOR()
+##        outputS += f"n{OR_IMAGE},"
+    '''
     if (("-x" in sys.argv) or (len(sys.argv) < 2)):
         buildXOR()
+##        outputS += f"{XOR_IMAGE},"
+
+##    outputS += f" are all stored]" 
+##    writeKey()
+    
     
     if DEBUGTIME:
         t1= time()
