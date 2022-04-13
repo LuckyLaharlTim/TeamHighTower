@@ -35,12 +35,13 @@ from random import choice, randint
 from PIL import Image
 
 # variables for debug lines and extra things
-DEBUGTIME = True
+DEBUGTIME = False
 DEBUGMOREFILES = False
 showPixels = False
+randKey = False
 
 # the image variables
-KEY_FILE = "05-key.txt"
+KEY_FILE = "05-key.txt" # messes up the given key file, but preserves ones it makes
 INPUT_IMAGE = "input.png"#"input.png"
 if DEBUGMOREFILES:
     AND_IMAGE = "and-"+INPUT_IMAGE
@@ -64,27 +65,37 @@ rows, cols = img.size
 def setKey():
 
     KEY_PIXELS = [[0]*cols]*rows
-    # print(f"there are {len(KEY_PIXELS)*len(KEY_PIXELS[0])} pixels in KEY_PIXELS")
+
+    
     # fills KEY_PIXELS
-    f = open(KEY_FILE)
+    if randKey:
+        for row in range(rows):
+            for col in range(cols):
+                KEY_PIXELS[row][col] = randint(0,255), randint(0,255), randint(0,255)
 
-    line = f.readline().strip()
-    for row in range(rows):
-        for col in range(cols):
-            line = line.split(",")
-            KEY_PIXELS[row][col] = int(line[0]), int(line[1]), int(line[2])
-            line = f.readline().strip()
-            
+    else:
+        f = open(KEY_FILE)
 
-    f.close()
+        line = f.readline().strip()
+        for row in range(rows):
+            for col in range(cols):
+                line = line.split(",")
+                KEY_PIXELS[row][col] = int(line[0]), int(line[1]), int(line[2])
+                line = f.readline().strip()
+    ##            if x==0:
+    ##                print(KEY_PIXELS[row][col])
+    ##            x+=1
+                
+
+        f.close()
     return KEY_PIXELS
 
 KEY_PIXELS = setKey()
 
 def writeKey():
     for rowCol in KEY_PIXELS:
-        for pixel in KEY_PIXELS:
-            sys.stdout.write(f"{pixel[0]},{pixel[1]},{pixel[2]}")
+        for pixel in rowCol:
+            sys.stdout.write(f"{pixel[0]},{pixel[1]},{pixel[2]}\n")
 
 def buildAND():
         
@@ -192,7 +203,7 @@ if __name__ == "__main__":
 ##        outputS += f"{XOR_IMAGE},"
 
 ##    outputS += f" are all stored]" 
-##    writeKey()
+    writeKey()
     
     
     if DEBUGTIME:
