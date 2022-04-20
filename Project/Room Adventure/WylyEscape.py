@@ -3,7 +3,7 @@
 # Date: 4/10/19
 # Description: floor Adventure
 ###########################################################################################
-from Tkinter import *
+from tkinter import *
 
 # the floor class
 # note that this class is fully implemented with dictionaries as illustrated in the lesson "More on Data Structures"
@@ -59,6 +59,21 @@ class Floor(object):
     def grabbables(self, value):
         self._grabbables = value
 
+    @property
+    def useables(self):
+        return self._useables
+
+    @useables.setter
+    def useables(self, value):
+        self._useables = value
+    
+    @property
+    def openables(self):
+        return self._openables
+
+    @openables.setter
+    def openables(self, value):
+        self._openables = value
   # adds an exit to the floor
   # the exit is a string (e.g., north)
   # the floor is an instance of a floor
@@ -84,6 +99,30 @@ class Floor(object):
     def delGrabbable(self, item):
         # remove the item from the list
         self._grabbables.remove(item)
+    
+  # adds a useable item to the floor
+  # the item is a string (e.g., key)
+    def addUseable(self, item):
+        # append the item to the list
+        self._useables.append(item)
+
+  # removes a useable item from the floor
+  # the item is a string (e.g., key)
+    def delUseable(self, item):
+        # remove the item from the list
+        self._useables.remove(item)
+
+# adds a openable item to the floor
+  # the item is a string (e.g., key)
+    def addOpenable(self, item):
+        # append the item to the list
+        self._openables.append(item)
+
+  # removes a openable item from the floor
+  # the item is a string (e.g., key)
+    def delOpenable(self, item):
+        # remove the item from the list
+        self._openables.remove(item)
 
   # returns a string description of the floor
     def __str__(self):
@@ -120,27 +159,51 @@ class Game(Frame):
     # creates the floors
     def createFloors(self):
         # create the floors and give them meaningful names
-        r1 = Floor("Floor 1", "room1.gif")
-        r2 = Floor("Floor 2", "room2.gif")
-        r3 = Floor("Floor 3", "room3.gif")
+        r1_e = Floor("Floor 3 Elevator", "room1.gif")
+        r1_1 = Floor("Floor 3 Room", "room1.gif")
+
+        r2_e = Floor("Floor 2 Elevator", "room2.gif")
+        r2_1 = Floor("Floor 2 Room 1", "room2.gif")
+        r2_2 = Floor ("Floor 2 Room 2", "room2.gif")
+
+        r3_e = Floor("Floor 3 Elevator", "room3.gif")
+        r3_1 = Floor("Floor 3 Room 1", "room3.gif")
+        r3_2 = Floor ("Floor 3 Room 2", "room3.gif")
+        r3_3 = Floor("Floor 3 Room 3", "room3.gif")
+        
         r4 = Floor("Finish", "room4.gif")
 
         # add exits to floor 1
-        r1.addExit("key1", r2) # -> to the east of floor 1 is floor 2
+        r1_e.addExit("key1", r2_e) # -> to the east of floor 1 is floor 2
+        r1_e.addExit("south", r1_1)
+        r1_1.addExit("elevator", r1_e)
 
         # add items to floor 1
         r1.addItem("chair", "It is made of wicker and no one is sitting on it.")
         r1.addItem("table", "It is made of oak. A golden key rests on it.")
 
         # add exits to floor 2
-        r2.addExit("key2", r3)
+        r2_e.addExit("key2", r3_e)
+        r2_e.addExit("south", r2_1)
+        r2_1.addExit("east", r2_2)
+        r2_2.addExit("west", r2_1)
+        r2_1.addExit("elevator", r2_e)
+        r2_2.addExit("elevator", r2_e)
 
         # add items to floor 2
-        r2.addItem("rug", "It is nice and Indian. It also needs to be vacuumed.")
-        r2.addItem("fireplace", "It is full of ashes.")
+        r2_1.addItem("rug", "It is nice and Indian. It also needs to be vacuumed.")
+        r2_1.addItem("fireplace", "It is full of ashes.")
 
         # add exits to floor 3
-        r3.addExit("key3", r4)
+        r3_e.addExit("key3", r4)
+        r3_e.addExit("south", r3_1)
+        r3_1.addExit("south", r3_2)
+        43_2.addExit("north", r3_1)
+        r3_2.addExit("east:", r3_3)
+        r3_3.addExit("west:", r3_2)
+        r3_1.addExit("elevator", r3_e)
+        r3_2.addExit("elevator", r3_e)
+        r3_3.addExit("elevator", r3_e)
 
         # add grabbables to floor 3
         r3.addGrabbable("book")
@@ -148,8 +211,6 @@ class Game(Frame):
         # set floor 1 as the current floor at the beginning of the game
         Game.currentFloor = r1
         Game.inventory = []  # makes the inventory empty
-
-
   # sets up the GUI
     def setupGUI(self):
         self.pack(fill = BOTH, expand = 1)
@@ -249,6 +310,13 @@ class Game(Frame):
 
                         response = "Item Grabbed"
                         break
+            elif(verb == "use"):
+                # default respone
+                response = "That item doesn't look like it can be used here."
+            
+            elif (verb == "open"):
+                # default response
+                response = "That can't be opened."
 
         self.setStatus(response)
         self.setFloorImage()
