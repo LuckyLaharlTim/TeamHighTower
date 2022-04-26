@@ -207,7 +207,7 @@ class Game(Frame):
         r2_1.addItem("rug", "It is nice and Indian. It also needs to be vacuumed.")
         r2_1.addItem("fireplace", "It is full of ashes.")
         r2_1.addItem("note", "It reads: On Tech, where is the clock that has stopped?")
-        r2_1.addItem("book", "inside the book there is an odly ciphered piece of text asking for a keyword (the exact text should be in your folder")
+        r2_1.addItem("book", "inside the book there is an odly ciphered piece of text written in the alpabet a-z1-9 asking for a keyword (the exact text should be in your folder")
         r2_1.addItem("desk", "A nice mahogany desk with a note sitting on it")
         r2_2.addItem("wierd cloocktower photo", "Perhaps there is something hidden in this photo of the clocktower (the photo should be in your directory)")
         r2_2.addItem("rotten orange", "someone needs to clean up around here")
