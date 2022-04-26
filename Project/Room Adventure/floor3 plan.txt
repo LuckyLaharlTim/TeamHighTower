@@ -1,0 +1,13 @@
+Floor 3 challenge:
+Key word cipher is one of the tenets of tech
+	- Banner with tenets of tech
+	- the actual keywrod is the latin name
+
+Ceaser cipher where the shift is the number of the tenets of tech:
+	- half east ceaser salad sitting at a table
+	- some obscure line reference the tenets maybe
+
+SHA256
+	- Random quote and we capitalize SHA or HASH 
+
+Final Question: "When does the legend of the Bulldog originate from?"
