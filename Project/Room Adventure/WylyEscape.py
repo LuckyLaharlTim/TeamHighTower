@@ -3,10 +3,10 @@
 # Date: 4/10/19
 # Description: floor Adventure
 ###########################################################################################
+import time
 from tkinter import *
+from tkinter import messagebox
 from threading import Thread
-from time import sleep
-import sys
 
 # the floor class
 # note that this class is fully implemented with dictionaries as illustrated in the lesson "More on Data Structures"
@@ -170,6 +170,7 @@ class Game(Frame):
     def __init__(self, parent):
         # call the constructor in the superclass
         Frame.__init__(self, parent)
+        self.t1 = None
 
     # creates the floors
     def createFloors(self):
@@ -211,8 +212,8 @@ class Game(Frame):
         r3_e.addExit("south", r3_1)
         r3_1.addExit("south", r3_2)
         r3_2.addExit("north", r3_1)
-        r3_2.addExit("east:", r3_3)
-        r3_3.addExit("west:", r3_2)
+        r3_2.addExit("east", r3_3)
+        r3_3.addExit("west", r3_2)
         r3_1.addExit("elevator", r3_e)
         r3_2.addExit("elevator", r3_e)
         r3_3.addExit("elevator", r3_e)
@@ -286,23 +287,90 @@ class Game(Frame):
         # set the current status
         self.setStatus("")
 
-    def timer():
-        for i in range(5):
-            sleep(i)
-        Game.currentFloor == None
+    def timerGUI():
+        # creating Tk window
+        root = Toplevel()
+
+        # setting geometry of tk window
+        root.geometry("300x100")
+        root.overrideredirect(True)
+        
+        # Declaration of variables
+        hour=StringVar()
+        minute=StringVar()
+        second=StringVar()
+        
+        # setting the default value as 0 and create labels
+        minute.set("00")
+        second.set("03")
+        minuteLabel = Label(root, textvariable=minute, font = ("Arial", 32)) 
+        minuteLabel.place(x=80,y=20)
+        secondLabel = Label(root, textvariable=second, font = ("Arial", 32)) 
+        secondLabel.place(x=130,y=20)
+
+        try:
+            # the input provided by the user is
+            # stored in here :temp
+            temp = int(minute.get())*60 + int(second.get())
+        except:
+            print("Please input the right value")
+        while temp >-1:
+                
+            # divmod(firstvalue = temp//60, secondvalue = temp%60)
+            mins,secs = divmod(temp,60)
+
+            # Converting the input entered in mins or secs to hours,
+            # mins ,secs(input = 110 min --> 120*60 = 6600 => 1hr :
+            # 50min: 0sec)
+            if mins >60:
+                    
+                # divmod(firstvalue = temp//60, secondvalue
+                # = temp%60)
+                mins = divmod(mins, 60)
+                
+            # using format () method to store the value up to
+            # two decimal places
+            minute.set("{0:2d}".format(mins))
+            second.set("{0:2d}".format(secs))
+
+            # updating the GUI window after decrementing the
+            # temp value every time
+            root.update()
+            time.sleep(1)
+
+            # when temp value = 0; then a messagebox pop's up
+            # with a message:"Time's up"
+            if (temp == 0):
+                root.destroy()
+                
+            # after every one sec the value of temp will be decremented
+            # by one
+            temp -= 1
+
+    def timerThread(self):
+        self.t1 = Thread(target=Game.timerGUI)
+        self.t1.start()
 
   # processes the player's input
     def process(self, event):
         action = Game.player_input.get()
         action = action.lower()
+        f3 = ("Floor 3 Elevator", "Floor 3 Room 1", "Floor 3 Room 2", "Floor 3 Room 3")
         response = "I don't understand. Try verb or noun. Valid verbs are go, look, take, open, use, or enter."
 
         if (action == "quit" or action == "bye"):
             exit(0)
 
         if (Game.currentFloor == None):
-            game.player_input.delete(0, END)
+            Game.player_input.delete(0, END)
             return
+
+        if (Game.currentFloor.name in f3):
+            if self.t1.is_alive():
+                pass
+            else:
+                Game.currentFloor = None
+                action = ""
 
         words = action.split()
         if (len(words) == 2):
@@ -313,7 +381,7 @@ class Game(Frame):
                 response = "INVALID EXIT"
                 if (noun in Game.currentFloor.exits):
                     Game.currentFloor = Game.currentFloor.exits[noun]
-                    response = "Floor Changed"
+                    response = "Room Changed"
 
             if (verb == "enter"):
                 response = "WRONG CODE"
@@ -321,8 +389,8 @@ class Game(Frame):
                     Game.currentFloor = Game.currentFloor.codes[noun]
                     response = "You got it! Moved to next challenge floor."
                     if (Game.currentFloor.name == "Floor 3 Elevator"):
-                        t1.start()
                         response = response + "\n" + "Timer started"
+                        Game.timerThread(self)
 
             elif (verb == "look"):
                 response = "I don't see anything"
