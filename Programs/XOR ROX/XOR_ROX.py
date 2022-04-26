@@ -8,16 +8,16 @@
 ##################################
 # Manual
 #
-# python(3) <fileName>.py <flag(s)> < input > output
+# python(3) <fileName>.py <flag(s)>  > output
 #
 # Flags:
 # no flag | will create AND, OR, & XOR versions of the INPUT_IMAGE in the current directory
 #
-# -a | will create an AND version of the INPUT_IMAGE in the current directory       
-#
-# -o | will create an OR version of the INPUT_IMAGE in the current directory
+# -a | will create an AND version of the INPUT_IMAGE in the current directory
+#       and write key used to stdout
+# -o | will create an OR version of the INPUT_IMAGE in the current directory and etc.
 #       
-# -x | will create an XOR version of the INPUT_IMAGE in the current directory 
+# -x | will create an XOR version of the INPUT_IMAGE in the current directory and etc.
 #
 # NOTE: flags can be used together
 #       

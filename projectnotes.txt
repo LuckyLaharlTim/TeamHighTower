@@ -1,0 +1,40 @@
+PREMISE: 
+This year for cyberstorm, Dr. Anky and Timo have gone to the extremes for their newest challenge. For this challenge, students are locked on the top floor of Wyly Tower and and have to search each floor for clues to get in the elevator and go down another floor. There are 3 challenge floors in total with each getting harder than the last. A combination of LA Tech Trivia knowledge and decryption skills are needed to escape. Tems will be awarded points for each floor they manage to complete and bonus points will be awarded for the teams that complete the fastest. 
+
+OR
+
+LES GUICE EVIL TWIN IS TRYING TO KILL CYBERSTORM BY KILLING THE CYBERSTORM PARTICIPANTS
+
+
+Floor 1:
+First key word is simple TECH or CHAMP. The result then ask a questions that hints at the second keyword. Decrypting the final time gives a simple la tech trivia question that is the answer to escape. There can be several red herring key words.
+
+Floor 2/3:
+Ceaser shift with a shift os 22 for Tech xxii. Could also mix in some more keyword ciphers or something. The SHA thing from challenge 2 would be cool.
+ 
+Something with Karl Malone.
+
+
+NOTES:
+- To split up work, could do one person in charge of documentation/presentation material and then everyone else is in charge of fully implementing 1 floor
+- Item descriptions will just have the hints of what is the next step in decrypting the cipher 
+- Possibility of grabbables but would need to figure out a purpose: THEY ADD TIME TO FINAL TIMER OR BONUS POINTS
+- can players die? how do we kill them? putting wrong code so many times leads to death?
+- do we want to randomize the solutions in some way if we do kill the player?
+- take pictures in wyly tower to put hints in
+- should the floors be bigger than 1 room?
+- increasing difficulty with each floor, mainly just adding more layers to the initial encryption
+- should we add a stopwatch or something to get how long it took to reach the end
+- do we need to account for players somehow being able to get into the source code during cyberstorm?
+- ask about needing to cite room adventure code
+
+ADDITIONS (goals/streatchgoals/ideas):
+- use/open verbs for more interactability (1)
+- rooms in floor (2)
+- timed final boss where you can die and have to restart (1)
+- grabbables for bonus points/more time (2)
+- stopwatch to add (3)
+- add easter eggs (breakdance) (4)
+- change gui
+- possibly two different versions of each og encryption text and final solution
+- password needed to start game
