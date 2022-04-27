@@ -10,7 +10,7 @@ Floor 1:
 First key word is simple TECH or CHAMP. The result then ask a questions that hints at the second keyword. Decrypting the final time gives a simple la tech trivia question that is the answer to escape. There can be several red herring key words.
 
 Floor 2/3:
-Ceaser shift with a shift os 22 for Tech xxii. Could also mix in some more keyword ciphers or something. The SHA thing from challenge 2 would be cool.
+Ceaser shift with a shift is 22 for Tech xxii. Could also mix in some more keyword ciphers or something. The SHA thing from challenge 2 would be cool.
  
 Something with Karl Malone.
 

@@ -8,6 +8,9 @@ from tkinter import *
 from tkinter import messagebox
 from threading import Thread
 
+
+DEBUG = True
+
 # the floor class
 # note that this class is fully implemented with dictionaries as illustrated in the lesson "More on Data Structures"
 class Floor(object):
@@ -115,6 +118,8 @@ class Floor(object):
     def addGrabbable(self, item):
         # append the item to the list
         self._grabbables.append(item)
+        if (item in self._items):
+            self.delGrabbable(item)
 
     # removes a grabbable item from the floor
     # the item is a string (e.g., key)
@@ -153,7 +158,8 @@ class Floor(object):
        # next, the items in the floor
         s += "You see: "
         for item in self.items.keys():
-            s += item + " "
+            s += item + ", "
+        s = s[:-2]
         s += "\n"
         s += "Exits: "
        
@@ -176,7 +182,7 @@ class Game(Frame):
     def createFloors(self):
         # create the floors and give them meaningful names
         r1_e = Floor("Floor 1 Elevator", "room1.gif")
-        r1_1 = Floor("Floor 3 Room", "room1.gif")
+        r1_1 = Floor("Floor 1 Room", "room1.gif")
 
         r2_e = Floor("Floor 2 Elevator", "room2.gif")
         r2_1 = Floor("Floor 2 Room 1", "room2.gif")
@@ -194,8 +200,24 @@ class Game(Frame):
         r1_1.addExit("elevator", r1_e)
 
         # add items to floor 1
-        r1_1.addItem("chair", "It is made of wicker and no one is sitting on it.")
-        r1_1.addItem("table", "It is made of oak. A golden key rests on it.")
+        r1_e.addItem("small_sign", "The sign reads 'Don't give up. Recall the blue skies of freedom.'")
+        
+        r1_1.addItem("chair", "It is made of wicker and no one is sitting on it.\nThe number 64 is engraved on it.")
+        r1_1.addItem("table", "It is made of oak. A golden key and a Game_Board rest on it.")
+        r1_1.addItem("caution_sign", "Take it nice and |slow|. Don't lose your life over a foolish accident.\nZzk wtzip s roiw zt Nwgsnkt?")
+        r1_1.addItem("Game_Board", "You see an 8x8 game board with chess pieces and Reversi disks on the side.\nYou feel like there's an opponent nearby despite being alone.")
+
+        # add grabbables to floor 1
+        r1_1.addGrabbable("caution_sign")
+        r1_1.addGrabbable("short_note") 
+        r1_1.addGrabbable("plaque")
+
+        # add (initially allowed) usables to floor 1
+        r1_1.addUseable("Game_Board")
+        r1_1.addUseable("keypad")
+        print(f"floor 1 room 1 useables: {r1_1.useables}")
+       
+        
 
         # add exits to floor 2
         r2_e.addExit("south", r2_1)
@@ -205,6 +227,7 @@ class Game(Frame):
         r2_2.addExit("elevator", r2_e)
 
         # add items to floor 2
+        r2_e.addItem("small_sign", "The sign reads 'Don't give up. Recall the blue skies of freedom.'")
         r2_1.addItem("rug", "It is nice and Indian. It also needs to be vacuumed.")
         r2_1.addItem("fireplace", "It is full of ashes.")
         r2_1.addItem("note", "It reads: On Tech, where is the clock that has stopped?")
@@ -213,6 +236,7 @@ class Game(Frame):
         r2_2.addItem("wierd cloocktower photo", "Perhaps there is something hidden in this photo of the clocktower (the photo should be in your directory)")
         r2_2.addItem("rotten orange", "someone needs to clean up around here")
         r2_2.addItem("trash can", "perhaps the rotten orange should go in here")
+        
         # add exits to floor 3
         r3_e.addExit("south", r3_1)
         r3_1.addExit("south", r3_2)
@@ -223,11 +247,15 @@ class Game(Frame):
         r3_2.addExit("elevator", r3_e)
         r3_3.addExit("elevator", r3_e)
 
+        # add items to floor 3
+        r3_e.addItem("small_sign", "The sign reads 'Don't give up. Recall the blue skies of freedom.'")
+        
         # add grabbables to floor 3
         r1_e.addGrabbable("book")
 
         # add exit codes to the floors
-        r1_e.addCode("key1", r2_e)
+        r1_1.addCode("u(7;q9#my_5;pjny",r1_1)
+        r1_e.addCode("harryhoward", r2_e)
         r2_e.addCode("11:05", r3_e)
         r3_e.addCode("key3",r4)
 
@@ -306,8 +334,9 @@ class Game(Frame):
         second=StringVar()
         
         # setting the default value as 0 and create labels
-        minute.set("00")
-        second.set("03")
+        # timer currently set to 01:30
+        minute.set("01")
+        second.set("30")
         minuteLabel = Label(root, textvariable=minute, font = ("Arial", 32)) 
         minuteLabel.place(x=80,y=20)
         secondLabel = Label(root, textvariable=second, font = ("Arial", 32)) 
@@ -356,6 +385,15 @@ class Game(Frame):
         self.t1 = Thread(target=Game.timerGUI)
         self.t1.start()
 
+    # for non-floor traversing codes
+    def specialCodeAct(floor, code):
+        # should replace with hashed password codes later
+        if code == "u(7;q9#my_5;pjny":
+            floor.delUseable("keypad")
+            floor.addItem("keypad_hint", "The solved keypad reads 'HarryHoward in word form binary'")
+            return "Great job on using the 'enter' command. You'll be using it a lot more.\nHere's your payload:\nHarryHoward in word form binary" 
+            
+
   # processes the player's input
     def process(self, event):
         action = Game.player_input.get()
@@ -388,14 +426,29 @@ class Game(Frame):
                     Game.currentFloor = Game.currentFloor.exits[noun]
                     response = "Room Changed"
 
+            if ((DEBUG) and verb == "codes"):
+                response = ''
+                for val in Game.currentFloor.codes:
+                    response += f"{val}\n"
+
             if (verb == "enter"):
                 response = "WRONG CODE"
+                    
                 if (noun in Game.currentFloor.codes):
-                    Game.currentFloor = Game.currentFloor.codes[noun]
-                    response = "You got it! Moved to next challenge floor."
-                    if (Game.currentFloor.name == "Floor 3 Elevator"):
-                        response = response + "\n" + "Timer started"
-                        Game.timerThread(self)
+                    # for extra codes that don't transfer you to a new floor
+                    #print(f"response was . . .\n{response}")
+                    
+                    if ("Elevator" not in Game.currentFloor.name):
+                        #print(f"wasn't in elevator\tcurrently in {Game.currentFloor.name}\noutput should be: {Game.specialCodeAct(Game.currentFloor, noun)}")
+                        response = Game.specialCodeAct(Game.currentFloor, noun)
+                    else:
+                        Game.currentFloor = Game.currentFloor.codes[noun]
+                        response = "You got it! Moved to next challenge floor."
+                        #print(f"was in elevator\tcurrently in {Game.currentFloor.name}\noutput should be: {response}")
+                        if (Game.currentFloor.name == "Floor 3 Elevator"):
+                            response = response + "\n" + "Timer started"
+                            Game.timerThread(self)
+                #print(f"response is now . . .\n{response}")
 
             elif (verb == "look"):
                 response = "I don't see anything"
