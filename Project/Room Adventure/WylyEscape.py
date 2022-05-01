@@ -9,6 +9,8 @@ from tkinter import *
 from tkinter import messagebox
 from threading import Thread
 from hashlib import md5
+from random import randint
+import time
 
 
 DEBUG = True
@@ -218,8 +220,8 @@ class Game(Frame):
         
         r1_1.addItem("chair", "It is made of wicker and no one is sitting on it.\nThe number |64| is engraved on it.")
         r1_1.addItem("table", "It is made of oak. A golden key and a Game_Board rest on it.")
-        r1_1.addItem("caution_sign", "Take it nice and |slow|. Don't lose your life over a foolish accident.\nZzk wtzip s roiw zt Nwgsnkt?")
-        r1_1.addItem("game_board", "You see an 8x8 game board with chess pieces and Reversi disks on the side.\nYou feel like there's an opponent nearby despite being alone.")
+        r1_1.addItem("caution_sign", "Take it nice and |slow|. Don't lose your life over a foolish accident.\nZzk wtzip s roiw?")
+        r1_1.addItem("game_board", "You see an 8x8 game board with chess pieces and Reversi disks on the side.\nThere is an antique gold dollar in the middle.")
 
         # add grabbables to floor 1
         r1_1.addGrabbable("caution_sign")
@@ -403,26 +405,7 @@ class Game(Frame):
         self.t1 = Thread(target=Game.timerGUI)
         self.t1.start()
 
-##    def miniGame(self):
-##        Game.inMinigame = True
-##        Game.setStatus("Welcome. For this game, we flip a coin. If it comes up head, you win. Press Enter to begin") # returns won/lost-easy/hard
-##        Game.player_input.bind("<Return>", self.process)
-##        if Game.coin:
-##            return "easy-won"
-##        else:
-##            return "easy-lost"
-##
-##    def result(self, floor, status):
-##        if "easy" in status:
-##            if won in status:
-##                floor.addGrabbable("short_note")
-##            else:
-##                Game.currentRoom = None
-##                Game.setStatus("death: You lost the coin toss. A simple mistake.")
-##                
-##        if "hard" in status:
-##            if won in status:
-##                floor.addGrabbable("plaque")
+
 
     # for non-floor traversing codes
     def specialCodeAct(floor, code):
@@ -452,14 +435,32 @@ class Game(Frame):
         else:
             return "That item doesn't look like it can be used here."
 
+    def coinflip(n, mustWin):
+        wins = 0
+
+        for j in range(n):
+            if (randint(0,1)):
+                wins+=1
+
+        if wins >= mustWin:
+            return True
+        return False
+    
     def useStatic(self, floor, noun):
+        tosses = randint(3,7)
+        mustWin = tosses/2+1
+        response = ""
+        
         if (floor.name == "Floor 1 Room"):
             if noun == "game_board":
-                if(1):
+                response += f"You played a round of coin flips with {tosses} tosses.\n"+\
+                            f"To win and get the prize, you need to call {mustWin} correctly.\n"
+                if(Game.coinflip(tosses, mustWin)):
                     floor.addGrabbable("short_note")
-                    return "The board parts down the middle and a *short_note* floats up beckoning you to take it."
-##                return self.result(floor,Game.miniGame()) # result will be the the addition of grabbables
-                                                    #  and the message for the action
+                    response += "\nYou won!\n\nThe board parts down the middle and a *short_note* floats up beckoning you to take it."
+                else:
+                    response += "\nYou lost :(\n\nNo prize for you. . ."
+                return response
                 
             elif noun == "keypad":
                 self.floor.addCode("u(7;q9#my_5;pjny",r1_1)
@@ -494,9 +495,7 @@ class Game(Frame):
 
         words = action.split()
 
-##        if self.inMinigame and action == "":
-##                self.coin = random.randint(0,1)
-        #elif            
+           
         if (len(words) == 2):
             verb = words[0]
             noun = words[1]
@@ -552,7 +551,6 @@ class Game(Frame):
                         response += "\nThere was a sticky_note underneath."
                     
             elif(verb == "use"):
-                print(f"current useables are: {Game.currentFloor.useables}")
                 # default respone
                 response = "That item doesn't look like it can be used here."
                 if (noun in Game.inventory):
