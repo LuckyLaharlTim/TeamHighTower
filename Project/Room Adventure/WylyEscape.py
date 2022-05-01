@@ -220,7 +220,7 @@ class Game(Frame):
         
         r1_1.addItem("chair", "It is made of wicker and no one is sitting on it.\nThe number |64| is engraved on it.")
         r1_1.addItem("table", "It is made of oak. A golden key and a Game_Board rest on it.")
-        r1_1.addItem("caution_sign", "Take it nice and |slow|. Don't lose your life over a foolish accident.\nZzk wtzip s roiw?")
+        r1_1.addItem("caution_sign", "Take it nice and |slow|. Don't lose your life over a foolish accident.\nZzk wtzip s roiw?\nEva ulipazb oarb hgzyo dzcow eck...")
         r1_1.addItem("game_board", "You see an 8x8 game board with chess pieces and Reversi disks on the side.\nThere is an antique gold dollar in the middle.")
 
         # add grabbables to floor 1
@@ -425,7 +425,7 @@ class Game(Frame):
             return "The short_note reads . . .\n"+\
                    "Dr. Guice just had to have a chess board in this room. Something "+\
                    "about the number of tiles, I think.\n\n"+\
-                   "A small stamp depicting the Roman Colosseum is in the bottom corner with 'g(7;c9#yk_5;bvzk' written across it."
+                   "A small stamp depicting the Roman Colosseum is in the bottom corner with 'wqkoapq ue g(7;c9#yk_5;bvzk' written across it."
         if (noun == "plaque"):
             return "The plaque reads . . .\n"+\
                    "Here's an easy hint as a reward\n"+\
@@ -463,7 +463,6 @@ class Game(Frame):
                 return response
                 
             elif noun == "keypad":
-                self.floor.addCode("u(7;q9#my_5;pjny",r1_1)
                 return "The keypad lights up and reads 'Please `enter` the password'."
 
     def checkItemToTake(floor,noun):
