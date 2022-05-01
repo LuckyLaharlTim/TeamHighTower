@@ -11,6 +11,8 @@ from threading import Thread
 
 DEBUG = True
 
+stop = False
+
 # the floor class
 # note that this class is fully implemented with dictionaries as illustrated in the lesson "More on Data Structures"
 class Floor(object):
@@ -169,8 +171,8 @@ class Floor(object):
             s += item + ", "
         s = s[:-2]
         s += "\n"
+
         s += "Exits: "
-       
         for exit in self.exits.keys():
             s += exit + " "
 
@@ -183,7 +185,7 @@ class Game(Frame):
 
     inMinigame = False
     coin = "num"
-    
+
     # the constructor
     def __init__(self, parent):
         # call the constructor in the superclass
@@ -193,19 +195,19 @@ class Game(Frame):
     # creates the floors
     def createFloors(self):
         # create the floors and give them meaningful names
-        r1_e = Floor("Floor 1 Elevator", "room1.gif")
-        r1_1 = Floor("Floor 1 Room", "room1.gif")
+        r1_e = Floor("Floor 1 Elevator", "Images/room1.gif")
+        r1_1 = Floor("Floor 1 Room", "Images/room1.gif")
 
-        r2_e = Floor("Floor 2 Elevator", "room2.gif")
-        r2_1 = Floor("Floor 2 Room 1", "room2.gif")
-        r2_2 = Floor ("Floor 2 Room 2", "room2.gif")
+        r2_e = Floor("Floor 2 Elevator", "Images/room2.gif")
+        r2_1 = Floor("Floor 2 Room 1", "Images/room2.gif")
+        r2_2 = Floor ("Floor 2 Room 2", "Images/room2.gif")
 
-        r3_e = Floor("Floor 3 Elevator", "room3.gif")
-        r3_1 = Floor("Floor 3 Room 1", "room3.gif")
-        r3_2 = Floor ("Floor 3 Room 2", "room3.gif")
-        r3_3 = Floor("Floor 3 Room 3", "room3.gif")
+        r3_e = Floor("Floor 3 Elevator", "Images/room3.gif")
+        r3_1 = Floor("Floor 3 Room 1", "Images/room3.gif")
+        r3_2 = Floor ("Floor 3 Room 2", "Images/room3.gif")
+        r3_3 = Floor("Floor 3 Room 3", "Images/room3.gif")
         
-        r4 = Floor("Finish", "room4.gif")
+        r4 = Floor("Win", "Images/win.gif")
 
         # add exits to floor 1
         r1_e.addExit("south", r1_1)
@@ -213,7 +215,7 @@ class Game(Frame):
 
         # add items to floor 1
         r1_e.addItem("small_sign", "The sign reads 'Don't give up. Recall the blue skies of freedom.'")
-        
+
         r1_1.addItem("chair", "It is made of wicker and no one is sitting on it.\nThe number |64| is engraved on it.")
         r1_1.addItem("table", "It is made of oak. A golden key and a Game_Board rest on it.")
         r1_1.addItem("caution_sign", "Take it nice and |slow|. Don't lose your life over a foolish accident.\nZzk wtzip s roiw zt Nwgsnkt?")
@@ -221,15 +223,15 @@ class Game(Frame):
 
         # add grabbables to floor 1
         r1_1.addGrabbable("caution_sign")
-        r1_1.addGrabbable("short_note") 
+        r1_1.addGrabbable("short_note")
         r1_1.addGrabbable("plaque")
 
         # add (initially allowed) usables to floor 1
         r1_1.addUseable("game_board")
         r1_1.addUseable("keypad")
-        
-       
-        
+
+
+
 
         # add exits to floor 2
         r2_e.addExit("south", r2_1)
@@ -240,15 +242,15 @@ class Game(Frame):
 
         # add items to floor 2
         r2_e.addItem("small_sign", "The sign reads 'Don't give up. Recall the blue skies of freedom.'")
-        r2_1.addItem("rug", "It is nice and Indian. It also needs to be vacuumed.")
+        r2_1.addItem("carpet", "It might have been nice at one point but now its just gross and dirty.")
         r2_1.addItem("fireplace", "It is full of ashes.")
         r2_1.addItem("note", "It reads: On Tech, where is the clock that has stopped?")
-        r2_1.addItem("book", "inside the book there is an odly ciphered piece of text written in the alpabet a-z1-9 asking for a keyword (the exact text should be in your folder")
-        r2_1.addItem("desk", "A nice mahogany desk with a note sitting on it")
-        r2_2.addItem("wierd cloocktower photo", "Perhaps there is something hidden in this photo of the clocktower (the photo should be in your directory)")
+        r2_1.addItem("book", "Inside the book there is an odly ciphered piece of text written in the alpabet a-z1-9 asking for a keyword (the exact text should be in your folder")
+        r2_1.addItem("coffee_table", "A nice coffee table with a note and book sitting on it")
+        r2_2.addItem("wierd clocktower photo", "Perhaps there is something hidden in this photo of the clocktower (the photo should be in your directory)")
         r2_2.addItem("rotten orange", "someone needs to clean up around here")
         r2_2.addItem("trash can", "perhaps the rotten orange should go in here")
-        
+
         # add exits to floor 3
         r3_e.addExit("south", r3_1)
         r3_1.addExit("south", r3_2)
@@ -261,7 +263,7 @@ class Game(Frame):
 
         # add items to floor 3
         r3_e.addItem("small_sign", "The sign reads 'Don't give up. Recall the blue skies of freedom.'")
-        
+
         # add grabbables to floor 3
         r1_e.addGrabbable("book")
 
@@ -300,7 +302,7 @@ class Game(Frame):
   # sets the current floor image
     def setFloorImage(self):
         if (Game.currentFloor == None):
-            Game.img = PhotoImage(file = "skull.gif")
+            Game.img = PhotoImage(file = "Images/dead.gif")
         else:
             Game.img = PhotoImage(file = Game.currentFloor.image)
 
@@ -313,13 +315,11 @@ class Game(Frame):
         Game.text.delete("1.0", END)
 
         if (Game.currentFloor == None):
-            msg = "You died!"
-            if "death:" in status:
-                msg += status[7:]
-                Game.text.insert(END, msg)
+            msg = "You died! Unfortunately, you didn't make it out \nof Wyly Tower before it closed and ended up \nstarving to death! Luckily the Lady of the Mist \nwas there to greet you in the afterlife."
+            Game.text.insert(END, msg)
         else:
                 Game.text.insert(END, str(Game.currentFloor) +\
-                                 "\n You are carrying: "+ str(Game.inventory) +\
+                                 "\nYou are carrying: "+ str(Game.inventory) +\
                                  "\n\n" + status)
 
         Game.text.config(state = DISABLED)
@@ -336,6 +336,7 @@ class Game(Frame):
         self.setStatus("")
 
     def timerGUI():
+        global stop
         # creating Tk window
         root = Toplevel()
 
@@ -350,8 +351,8 @@ class Game(Frame):
         
         # setting the default value as 0 and create labels
         # timer currently set to 01:30
-        minute.set("01")
-        second.set("30")
+        minute.set("00")
+        second.set("05")
         minuteLabel = Label(root, textvariable=minute, font = ("Arial", 32)) 
         minuteLabel.place(x=80,y=20)
         secondLabel = Label(root, textvariable=second, font = ("Arial", 32)) 
@@ -391,6 +392,9 @@ class Game(Frame):
             # with a message:"Time's up"
             if (temp == 0):
                 root.destroy()
+
+            if (stop):
+                root.destroy()
                 
             # after every one sec the value of temp will be decremented
             # by one
@@ -416,7 +420,7 @@ class Game(Frame):
 ##            else:
 ##                Game.currentRoom = None
 ##                Game.setStatus("death: You lost the coin toss. A simple mistake.")
-##                
+##
 ##        if "hard" in status:
 ##            if won in status:
 ##                floor.addGrabbable("plaque")
@@ -457,7 +461,7 @@ class Game(Frame):
                     return "The board parts down the middle and a *short_note* floats up beckoning you to take it."
 ##                return self.result(floor,Game.miniGame()) # result will be the the addition of grabbables
                                                     #  and the message for the action
-                
+
             elif noun == "keypad":
                 self.floor.addCode("u(7;q9#my_5;pjny",r1_1)
                 return "The keypad lights up and reads 'Please `enter` the password'."
@@ -466,7 +470,7 @@ class Game(Frame):
         if (noun == "caution_sign"):
             floor.addItem("sticky_note", "It reads 'There's this odd *keypad* underneath the table'.")
             floor.addItem("keypad", "It lightly shines waiting for you to enter a code.")
-            
+
 
   # processes the player's input
     def process(self, event):
@@ -474,6 +478,7 @@ class Game(Frame):
         action = action.lower()
         f3 = ("Floor 3 Elevator", "Floor 3 Room 1", "Floor 3 Room 2", "Floor 3 Room 3")
         response = "I don't understand. Try verb or noun. Valid verbs are go, look, take, open, use, or enter."
+        global stop
 
         if (action == "quit" or action == "bye"):
             exit(0)
@@ -488,12 +493,13 @@ class Game(Frame):
             else:
                 Game.currentFloor = None
                 action = ""
+                response = ""
 
         words = action.split()
 
 ##        if self.inMinigame and action == "":
 ##                self.coin = random.randint(0,1)
-        #elif            
+        #elif
         if (len(words) == 2):
             verb = words[0]
             noun = words[1]
@@ -511,21 +517,24 @@ class Game(Frame):
 
             if (verb == "enter"):
                 response = "WRONG CODE"
-                    
                 if (noun in Game.currentFloor.codes):
                     # for extra codes that don't transfer you to a new floor
-                    
-                    
+
+
                     if ("Elevator" not in Game.currentFloor.name):
                         response = Game.specialCodeAct(Game.currentFloor, noun)
                     else:
                         Game.currentFloor = Game.currentFloor.codes[noun]
-                        response = "You got it! Moved to next challenge floor.\nYou dropped everything you obtained on this floor in the void."
+                        if (Game.currentFloor.name == "Win"):
+                            response = "Congratulations! You managed to escape Wyly Tower and complete the Wyly Tower Escape Challenge."
+                            stop = True
+                        else:
+                            response = "You got it! Moved to next challenge floor.\nYou dropped everything you obtained on this floor in the void."
                         if (Game.currentFloor.name == "Floor 3 Elevator"):
-                            response = response + "\n" + "Timer started"
+                            response = response + "\n\n" + "Uh oh! There's only 5 minutes left until Wyly Tower closes! \nIf you don't get the last code in time, you'll be stuck inside for who knows how long. \nBetter hurry!"
                             Game.timerThread(self)
                         Game.inventory = []
-                
+
 
             elif (verb == "look"):
                 response = "I don't see anything"
@@ -535,7 +544,7 @@ class Game(Frame):
 
             elif (verb == "take"):
                 response = "I can't take anything"
-                
+
                 if noun in Game.currentFloor.grabbables:
                     Game.inventory.append(noun)
                     Game.currentFloor.delGrabbable(noun)
@@ -546,7 +555,7 @@ class Game(Frame):
                     response = "Item Grabbed"
                     if noun == "caution_sign":
                         response += "\nThere was a sticky_note underneath."
-                    
+
             elif(verb == "use"):
                 print(f"current useables are: {Game.currentFloor.useables}")
                 # default respone
@@ -555,7 +564,7 @@ class Game(Frame):
                     response = Game.useItem(noun)
                 elif (noun in Game.currentFloor.useables):
                     response = self.useStatic(Game.currentFloor, noun)
-            
+
             elif (verb == "open"):
                 # default response
                 response = "That can't be opened."
