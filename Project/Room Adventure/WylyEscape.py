@@ -1,12 +1,16 @@
 ###########################################################################################
-# Name: Megan Cox
-# Date: 4/10/19
-# Description: floor Adventure
+# Group Name:   Team Hightower
+# Members:      Cori Albritton, Megan Cox, Peter Ford, Timothy Oliver
+# Assignment:   CyberStorm Challenge - "Wyly Tower Escape"
+# Date:         2 May 2022
 ###########################################################################################
 import time
 from tkinter import *
 from tkinter import messagebox
 from threading import Thread
+from hashlib import md5
+from random import randint
+import time
 
 
 DEBUG = True
@@ -218,8 +222,8 @@ class Game(Frame):
 
         r1_1.addItem("chair", "It is made of wicker and no one is sitting on it.\nThe number |64| is engraved on it.")
         r1_1.addItem("table", "It is made of oak. A golden key and a Game_Board rest on it.")
-        r1_1.addItem("caution_sign", "Take it nice and |slow|. Don't lose your life over a foolish accident.\nZzk wtzip s roiw zt Nwgsnkt?")
-        r1_1.addItem("Game_Board", "You see an 8x8 game board with chess pieces and Reversi disks on the side.\nYou feel like there's an opponent nearby despite being alone.")
+        r1_1.addItem("caution_sign", "Take it nice and |slow|. Don't lose your life over a foolish accident.\nZzk wtzip s roiw?\nEva ulipazb oarb hgzyo dzcow eck...")
+        r1_1.addItem("game_board", "You see an 8x8 game board with chess pieces and Reversi disks on the side.\nThere is an antique gold dollar in the middle.")
 
         # add grabbables to floor 1
         r1_1.addGrabbable("caution_sign")
@@ -251,6 +255,7 @@ class Game(Frame):
         r2_2.addItem("rotten orange", "someone needs to clean up around here")
         r2_2.addItem("trash can", "perhaps the rotten orange should go in here")
 
+
         # add exits to floor 3
         r3_e.addExit("south", r3_1)
         r3_1.addExit("south", r3_2)
@@ -268,10 +273,11 @@ class Game(Frame):
         r1_e.addGrabbable("book")
 
         # add exit codes to the floors
-        r1_1.addCode("u(7;q9#my_5;pjny",r1_1)
-        r1_e.addCode("harryhoward", r2_e)
-        r2_e.addCode("11:05", r3_e)
-        r3_e.addCode("key3",r4)
+        #md5(str(int(<code>)).encode('UTF-7')).hexdigest()
+        r1_1.addCode("e8b2c37a58d295c8828e54a01f87a46b",r1_1) # "u(7;q9#my_5;pjny"
+        r1_e.addCode("0684f3d1561cb44c4e88e31530742cc4", r2_e) # "harryhoward"
+        r2_e.addCode("ee0eafb3520cbc3a744bb41656f0a737", r3_e) # "11:05"
+        r3_e.addCode("3631578538a2d6ba5879b31a9a42f290",r4) # "key3"
 
         # set floor 1 as the current floor at the beginning of the game
         Game.currentFloor = r1_e
@@ -404,31 +410,10 @@ class Game(Frame):
         self.t1 = Thread(target=Game.timerGUI)
         self.t1.start()
 
-##    def miniGame(self):
-##        Game.inMinigame = True
-##        Game.setStatus("Welcome. For this game, we flip a coin. If it comes up head, you win. Press Enter to begin") # returns won/lost-easy/hard
-##        Game.player_input.bind("<Return>", self.process)
-##        if Game.coin:
-##            return "easy-won"
-##        else:
-##            return "easy-lost"
-##
-##    def result(self, floor, status):
-##        if "easy" in status:
-##            if won in status:
-##                floor.addGrabbable("short_note")
-##            else:
-##                Game.currentRoom = None
-##                Game.setStatus("death: You lost the coin toss. A simple mistake.")
-##
-##        if "hard" in status:
-##            if won in status:
-##                floor.addGrabbable("plaque")
-
     # for non-floor traversing codes
     def specialCodeAct(floor, code):
         # should replace with hashed password codes later
-        if code == "u(7;q9#my_5;pjny":
+        if code == "e8b2c37a58d295c8828e54a01f87a46b":
             floor.delUseable("keypad")
             floor.addItem("keypad_hint", "The solved keypad reads 'W?W?W???W??WW?W?WW?WWWWWW??WW??WW??W????W??W??WWW??W??WWW??W????W???W???WW?WWWWWW??W?WW?W??W???WWW?WWWWWW???W?WWW??W?WWWW??WW?W?WW?WWWWWW??WW??WW??W????W??W????W???W?WWW???WW??W???W?WWW??WW?W?W???WWWWW???WW??WW?WWWWWW??W????W??WW??WWW?WWWWWW??W????W???W?W?W???WW?WWW?WWWWWW??W???WW??W????W???W?W?W???WW?WW??W?WW?W???WW??W??W?WWWW??W?WW?W??W???WW??WW???WW?WWWWWW??W??W?W??W????W???W?WWW??W?WWWW??WW?W?W???WW?WWW?WW???W???WW??WW?WWWWWW??WW??WW??W?WW?W???WW?WW???WW??W???W?WWWW?WWWWWW??WWW?WW??WWWW?W??WWW?WW????WW?WW?WWWWWW??WWW?WW??W?WW?W???WW?WW??WW?WWWW?WWWWWW???W???W??W?WWWW??W????WW?WWWWWW??WW??WW??W??WWW??WW?W?W???W???WW?WWWWWW???W?WWW??W?WWWW??WW?W?WW?WWWWWW??W???WW??WW?W?W???WW??W???W?WWWW?WWWWWW??W?WW?W??W???WWW?WWWWWW?WW??W?W?WWW?WWW?WWWW??W?WWWW??W?WWWW??W?W??WWWW?WWWW??W?W?W??WW?WW?WW?W?WW?WW?WW?W???W'\n")
 
@@ -443,7 +428,7 @@ class Game(Frame):
             return "The short_note reads . . .\n"+\
                    "Dr. Guice just had to have a chess board in this room. Something "+\
                    "about the number of tiles, I think.\n\n"+\
-                   "A small stamp depicting the Roman Colosseum is in the bottom corner with 'g(7;c9#yk_5;bvzk' written across it."
+                   "A small stamp depicting the Roman Colosseum is in the bottom corner with 'wqkoapq ue g(7;c9#yk_5;bvzk' written across it."
         if (noun == "plaque"):
             return "The plaque reads . . .\n"+\
                    "Here's an easy hint as a reward\n"+\
@@ -453,17 +438,34 @@ class Game(Frame):
         else:
             return "That item doesn't look like it can be used here."
 
+    def coinflip(n, mustWin):
+        wins = 0
+
+        for j in range(n):
+            if (randint(0,1)):
+                wins+=1
+
+        if wins >= mustWin:
+            return True
+        return False
+    
     def useStatic(self, floor, noun):
+        tosses = randint(3,7)
+        mustWin = tosses/2+1
+        response = ""
+        
         if (floor.name == "Floor 1 Room"):
             if noun == "game_board":
-                if(1):
+                response += f"You played a round of coin flips with {tosses} tosses.\n"+\
+                            f"To win and get the prize, you need to call {mustWin} correctly.\n"
+                if(Game.coinflip(tosses, mustWin)):
                     floor.addGrabbable("short_note")
                     return "The board parts down the middle and a *short_note* floats up beckoning you to take it."
 ##                return self.result(floor,Game.miniGame()) # result will be the the addition of grabbables
                                                     #  and the message for the action
 
+
             elif noun == "keypad":
-                self.floor.addCode("u(7;q9#my_5;pjny",r1_1)
                 return "The keypad lights up and reads 'Please `enter` the password'."
 
     def checkItemToTake(floor,noun):
@@ -496,10 +498,6 @@ class Game(Frame):
                 response = ""
 
         words = action.split()
-
-##        if self.inMinigame and action == "":
-##                self.coin = random.randint(0,1)
-        #elif
         if (len(words) == 2):
             verb = words[0]
             noun = words[1]
@@ -517,14 +515,16 @@ class Game(Frame):
 
             if (verb == "enter"):
                 response = "WRONG CODE"
-                if (noun in Game.currentFloor.codes):
+                code = str(md5(noun.encode('UTF-7')).hexdigest())
+                if (code in Game.currentFloor.codes):
+
                     # for extra codes that don't transfer you to a new floor
 
 
                     if ("Elevator" not in Game.currentFloor.name):
-                        response = Game.specialCodeAct(Game.currentFloor, noun)
+                        response = Game.specialCodeAct(Game.currentFloor, code)
                     else:
-                        Game.currentFloor = Game.currentFloor.codes[noun]
+                        Game.currentFloor = Game.currentFloor.codes[code]
                         if (Game.currentFloor.name == "Win"):
                             response = "Congratulations! You managed to escape Wyly Tower and complete the Wyly Tower Escape Challenge."
                             stop = True
@@ -557,7 +557,6 @@ class Game(Frame):
                         response += "\nThere was a sticky_note underneath."
 
             elif(verb == "use"):
-                print(f"current useables are: {Game.currentFloor.useables}")
                 # default respone
                 response = "That item doesn't look like it can be used here."
                 if (noun in Game.inventory):
