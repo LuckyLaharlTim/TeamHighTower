@@ -459,14 +459,15 @@ class Game(Frame):
                             f"To win and get the prize, you need to call {mustWin} correctly.\n"
                 if(Game.coinflip(tosses, mustWin)):
                     floor.addGrabbable("short_note")
-                    return "The board parts down the middle and a *short_note* floats up beckoning you to take it."
+                    response += "The board parts down the middle and a *short_note* floats up beckoning you to take it."
 ##                return self.result(floor,Game.miniGame()) # result will be the the addition of grabbables
                                                     #  and the message for the action
 
 
             elif noun == "keypad":
-                return "The keypad lights up and reads 'Please `enter` the password'."
+                response+= "The keypad lights up and reads 'Please `enter` the password'."
 
+            return response
     def checkItemToTake(floor,noun):
         if (noun == "caution_sign"):
             floor.addItem("sticky_note", "It reads 'There's this odd *keypad* underneath the table'.")
