@@ -450,7 +450,7 @@ class Game(Frame):
     
     def useStatic(self, floor, noun):
         tosses = randint(3,7)
-        mustWin = tosses/2+1
+        mustWin = tosses//2+1
         response = ""
         
         if (floor.name == "Floor 1 Room"):
@@ -459,7 +459,9 @@ class Game(Frame):
                             f"To win and get the prize, you need to call {mustWin} correctly.\n"
                 if(Game.coinflip(tosses, mustWin)):
                     floor.addGrabbable("short_note")
-                    response += "The board parts down the middle and a *short_note* floats up beckoning you to take it."
+                    response += "\nYou won!\n\nThe board parts down the middle and a *short_note* floats up beckoning you to take it."
+                else:
+                    response += "\nYou lost :(\n\nLooks like you'll have to try again."
 ##                return self.result(floor,Game.miniGame()) # result will be the the addition of grabbables
                                                     #  and the message for the action
 
@@ -468,6 +470,7 @@ class Game(Frame):
                 response+= "The keypad lights up and reads 'Please `enter` the password'."
 
             return response
+
     def checkItemToTake(floor,noun):
         if (noun == "caution_sign"):
             floor.addItem("sticky_note", "It reads 'There's this odd *keypad* underneath the table'.")
