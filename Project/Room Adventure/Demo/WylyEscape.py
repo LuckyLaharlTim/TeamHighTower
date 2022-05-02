@@ -199,17 +199,17 @@ class Game(Frame):
     # creates the floors
     def createFloors(self):
         # create the floors and give them meaningful names
-        r1_e = Floor("Floor 1 Elevator", "Images/e1.gif")
-        r1_1 = Floor("Floor 1 Room", "Images/f1r1.gif")
+        r1_e = Floor("Floor 3 Elevator", "Images/e1.gif")
+        r1_1 = Floor("Floor 3 Room", "Images/f1r1.gif")
 
         r2_e = Floor("Floor 2 Elevator", "Images/e2.gif")
         r2_1 = Floor("Floor 2 Room 1", "Images/f2r1.gif")
         r2_2 = Floor ("Floor 2 Room 2", "Images/f2r2.gif")
 
-        r3_e = Floor("Floor 3 Elevator", "Images/e3.gif")
-        r3_1 = Floor("Floor 3 Room 1", "Images/f3r1.gif")
-        r3_2 = Floor ("Floor 3 Room 2", "Images/f3r2.gif")
-        r3_3 = Floor("Floor 3 Room 3", "Images/f3r3.gif")
+        r3_e = Floor("Floor 1 Elevator", "Images/e3.gif")
+        r3_1 = Floor("Floor 1 Room 1", "Images/f3r1.gif")
+        r3_2 = Floor ("Floor 1 Room 2", "Images/f3r2.gif")
+        r3_3 = Floor("Floor 1 Room 3", "Images/f3r3.gif")
         
         r4 = Floor("Win", "Images/win.gif")
 
@@ -477,7 +477,7 @@ class Game(Frame):
     def process(self, event):
         action = Game.player_input.get()
         action = action.lower()
-        f3 = ("Floor 3 Elevator", "Floor 3 Room 1", "Floor 3 Room 2", "Floor 3 Room 3")
+        f3 = ("Floor 1 Elevator", "Floor 1 Room 1", "Floor 1 Room 2", "Floor 1 Room 3")
         response = "I don't understand. Try verb or noun. Valid verbs are go, look, take, open, use, or enter."
         global stop
 
@@ -579,7 +579,7 @@ HEIGHT = 600
 
 # create the window
 window = Tk()
-window.title("Extreme Wyly Tower Escape")
+window.title("The Great Wyly Tower Escape")
 
 # create the GUI as a Tkinter canvas inside the window
 g = Game(window)
