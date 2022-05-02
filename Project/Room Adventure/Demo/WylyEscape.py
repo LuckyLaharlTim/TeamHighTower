@@ -1,7 +1,7 @@
 ###########################################################################################
 # Group Name:   Team Hightower
 # Members:      Cori Albritton, Megan Cox, Peter Ford, Timothy Oliver
-# Assignment:   CyberStorm Challenge - "Wyly Tower Escape"
+# Assignment:   CyberStorm Challenge - "The Great Wyly Tower Escape"
 # Date:         2 May 2022
 ###########################################################################################
 import time
@@ -208,7 +208,7 @@ class Game(Frame):
 
         r3_e = Floor("Floor 3 Elevator", "Images/e3.gif")
         r3_1 = Floor("Floor 3 Room 1", "Images/f3r1.gif")
-        r3_2 = Floor ("Floor 3 Room 2", "Images/f342.gif")
+        r3_2 = Floor ("Floor 3 Room 2", "Images/f3r2.gif")
         r3_3 = Floor("Floor 3 Room 3", "Images/f3r3.gif")
         
         r4 = Floor("Win", "Images/win.gif")
