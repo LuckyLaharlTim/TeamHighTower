@@ -273,7 +273,11 @@ class Game(Frame):
 
         # add items to floor 3
         r3_e.addItem("small_sign", "The sign reads 'Don't give up. Recall the blue skies of freedom.'")
-
+        r3_1.addItem("banner", "The banner lists all the Tennets of Tech, the \n|KEY| qualities of all Tech students...which is your favorite?")
+        r3_1.addItem("sticky_note", "The sticky note says: 'Bwi 7s7wu6si x66 xzw 2ifb 6s64 xw MNLBR alphabet:A-Z0-9'")
+        r3_2.addItem("salad", "Gross, its a half eaten |CAESAR| salad...and the reciept says 'H52 82m hc h52 b2lh fcca 6g k52b6bfca2'")
+        r3_2.addItem("couch_cushion", "Kinda grimy...and someone wrote in sharpie 'my \n|SHIFT| starts soon, I wonder how many tennets of tech there are?'")
+        r3_3.addItem("poster", "Ooh SHAnia Twain! And she signed it saying 'the \nlegend of the bulldog was in which year?'")
         # add grabbables to floor 3
         r1_e.addGrabbable("book")
 
@@ -282,9 +286,9 @@ class Game(Frame):
         r1_1.addCode("e8b2c37a58d295c8828e54a01f87a46b",r1_1) # "u(7;q9#my_5;pjny"
         r1_e.addCode("0684f3d1561cb44c4e88e31530742cc4", r2_e) # "harryhoward"
         r2_e.addCode("ee0eafb3520cbc3a744bb41656f0a737", r3_e) # "11:05"
-        r3_e.addCode("3631578538a2d6ba5879b31a9a42f290",r4) # "key3"
-        r3_1.addCode("c7218260ef2b966ab0454e07c55cf4e9", r3_2)
-        r3_2.addCode("7fa3b767c460b54a2be4d49030b349c7", r3_1)
+        r3_e.addCode("67dbacfcdb2e0c98068a70670301c248",r4) # "7c72066c66a912cdecd0cc67136a49d31796193a26486d6b494b131c0d24f058"
+        r3_1.addCode("c9e8bebd1f410934b634288c41048dc9", r3_2) #"45679"
+        r3_2.addCode("4178e05147e71984321ffeec75a09b52", r3_3) # "wheninrome"
 
         # set floor 1 as the current floor at the beginning of the game
         Game.currentFloor = r1_e
@@ -419,6 +423,7 @@ class Game(Frame):
 
     # for non-floor traversing codes
     def specialCodeAct(self, floor, code):
+        msg = 'WRONG CODE'
         # should replace with hashed password codes later
         if code == "e8b2c37a58d295c8828e54a01f87a46b":
             floor.delUseable("keypad")
@@ -429,10 +434,10 @@ class Game(Frame):
             floor.addItem("keypad_hint4","??W?W??W?WW??WW?W?W???WW?WW??W????W?W??W?WW??WW?W?W???WW?WW??W????W?WW????W??W???WW??WW?W?W?W??W?WW??WW?W?W???WW?WW??W????W?W??W?WW??WW?W?W???WW?WW??W????W?WW????W??W???WW??WW?W?W?WW????W??W???WW??WW?W?W?WW????W??W???WW??WW?W?W?WW????W??W???WW??WW?W?W?W??W?WW??WW?W?W???WW?WW??W????W?WW????W??W???WW??WW?W?W?W??W?WW??WW?W?W???WW?WW??W????W?W??W?WW??WW?W?W???WW?WW??W????W?W??W?WW??WW?W?W???WW?WW??W????W?WW????W??W???WW??WW?W?W?WW????W??W???WW??WW?W?W?W??W?WW??WW?W?W???WW?WW??W????W?WW????W??W???WW??WW?W?W?WW????W??W???WW??WW?W?W?W??W?WW??WW?W?W???WW?WW??W????W?W??W?WW??WW?W?W???WW?WW??W????W?WW????W??W???WW??WW?W?W?WW????W??W???WW??WW?W?W?W??W?WW??WW?W?W???WW?WW??W????W?WW????W??W???WW??WW?W?W?WW????W??W???WW??WW?W?")
             floor.delCode(code)
             msg = "Great job on using the 'enter' command. You'll be using it a lot more.\nLook for some new items or a *plaque*."
-        elif code == "c7218260ef2b966ab0454e07c55cf4e9":
+        elif code == "c9e8bebd1f410934b634288c41048dc9":
             self.goR2 = True
             msg = "The door unlocked!"
-        elif code == "7fa3b767c460b54a2be4d49030b349c7":
+        elif code == "4178e05147e71984321ffeec75a09b52":
             self.goR3 = True
             msg = "The door unlocked!"
         return msg
@@ -522,13 +527,13 @@ class Game(Frame):
                 response = "INVALID EXIT"
                 if (noun in Game.currentFloor.exits):
                     if ((Game.currentFloor.name == "Floor 3 Room 1")):
-                        if self.goR2:
+                        if self.goR2 or not(noun == "south"):
                             Game.currentFloor = Game.currentFloor.exits[noun]
                             response = "Room Changed"
                         else:
                             response = "The door is locked, and you can't open it."
                     elif Game.currentFloor.name == "Floor 3 Room 2":
-                        if self.goR3:
+                        if self.goR3 or not(noun == "east"):
                             Game.currentFloor = Game.currentFloor.exits[noun]
                             response = "Room Changed"
                         else:
