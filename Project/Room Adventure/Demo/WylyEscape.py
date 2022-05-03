@@ -250,10 +250,10 @@ class Game(Frame):
         r2_1.addItem("book",
                      "Inside the book there is an odly ciphered piece of text written in the alpabet a-z1-9 asking for a keyword (the exact text should be in your folder")
         r2_1.addItem("coffee_table", "A nice coffee table with a note and book sitting on it")
-        r2_2.addItem("wierd clocktower photo",
+        r2_2.addItem("wierd_clocktower_photo",
                      "Perhaps there is something hidden in this photo of the clocktower (the photo should be in your directory)")
-        r2_2.addItem("rotten orange", "someone needs to clean up around here")
-        r2_2.addItem("trash can", "perhaps the rotten orange should go in here")
+        r2_2.addItem("rotten_orange", "someone needs to clean up around here")
+        r2_2.addItem("trash_can", "perhaps the rotten orange should go in here")
 
         # add exits to floor 3
         r3_e.addExit("south", r3_1)
