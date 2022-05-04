@@ -3,6 +3,8 @@
 # Members:      Cori Albritton, Megan Cox, Peter Ford, Timothy Oliver
 # Assignment:   CyberStorm Challenge - "Wyly Tower Escape"
 # Date:         2 May 2022
+# Credit:       Base Room Adventure code is sourced from the Room Adventure Activity in the CSC 131: The Science of Computing II textbook.
+#               Timer gui is created based on a modified version of the code found here: https://www.geeksforgeeks.org/create-countdown-timer-using-python-tkinter/
 ###########################################################################################
 import time
 from tkinter import *
