@@ -213,7 +213,7 @@ class Game(Frame):
         r3_2 = Floor ("Floor 3 Room 2", "Images/f3r2.gif")
         r3_3 = Floor("Floor 3 Room 3", "Images/f3r3.gif")
         
-        r4 = Floor("Win", "Images/win.gif")
+        r4 = Floor("Win", "Images/win.png")
 
         # add exits to floor 1
         r1_e.addExit("south", r1_1)
@@ -250,9 +250,9 @@ class Game(Frame):
         r2_e.addItem("small_sign", "The sign reads 'Don't give up. Recall the blue skies of freedom.'")
         r2_1.addItem("carpet", "It might have been nice at one point but now its just gross and dirty.")
         r2_1.addItem("note", "It reads: On Tech, where is the clock that has stopped?")
-        r2_1.addItem("book", "Inside the book there is an odly ciphered piece of text written in the alpabet a-z1-9 asking for a keyword (the exact text should be in your folder")
+        r2_1.addItem("book", "Inside the book there is an odly ciphered piece of text written in the alpabet a-z1-9 asking for a keyword (the exact text should be in your clues folder")
         r2_1.addItem("coffee_table", "A nice coffee table with a note and book sitting on it")
-        r2_2.addItem("wierd clocktower photo", "Perhaps there is something hidden in this photo of the clocktower (the photo should be in your directory)")
+        r2_2.addItem("weird clocktower photo", "Perhaps there is something hidden in this photo of the clocktower. If only you had someThing to get a better look at it. (the photo can be found in the clues folder)")
         r2_2.addItem("rotten orange", "someone needs to clean up around here")
         r2_2.addItem("trash can", "perhaps the rotten orange should go in here")
 
@@ -282,13 +282,12 @@ class Game(Frame):
         r1_e.addGrabbable("book")
 
         # add exit codes to the floors
-        # str(md5((" ").encode('UTF-7')).hexdigest())
-        r1_1.addCode("e8b2c37a58d295c8828e54a01f87a46b",r1_1) # "u(7;q9#my_5;pjny"
-        r1_e.addCode("0684f3d1561cb44c4e88e31530742cc4", r2_e) # "harryhoward"
-        r2_e.addCode("ee0eafb3520cbc3a744bb41656f0a737", r3_e) # "11:05"
-        r3_e.addCode("67dbacfcdb2e0c98068a70670301c248",r4) # "7c72066c66a912cdecd0cc67136a49d31796193a26486d6b494b131c0d24f058"
-        r3_1.addCode("c9e8bebd1f410934b634288c41048dc9", r3_2) #"45679"
-        r3_2.addCode("4178e05147e71984321ffeec75a09b52", r3_3) # "wheninrome"
+        r1_1.addCode("854d6fae5ee42911677c739ee1734486",r1_1)
+        r1_e.addCode("0684f3d1561cb44c4e88e31530742cc4", r2_e)
+        r2_e.addCode("ee0eafb3520cbc3a744bb41656f0a737", r3_e)
+        r3_e.addCode("67dbacfcdb2e0c98068a70670301c248",r4)
+        r3_1.addCode("c9e8bebd1f410934b634288c41048dc9", r3_2)
+        r3_2.addCode("4178e05147e71984321ffeec75a09b52", r3_3)
 
         # set floor 1 as the current floor at the beginning of the game
         Game.currentFloor = r1_e
@@ -332,7 +331,7 @@ class Game(Frame):
         Game.text.delete("1.0", END)
 
         if (Game.currentFloor == None):
-            msg = "You died! Unfortunately, you didn't make it out \nof Wyly Tower before it closed and ended up \nstarving to death! Luckily the Lady of the Mist \nwas there to greet you in the afterlife."
+            msg = "You died!\n\nUnfortunately, you didn't make it out \nof Wyly Tower before it closed. You tried to\navoid starvation by eating the rotten orange from\nfloor 2 but ended up getting food poisioning\nand dieing! Luckily the Lady of the Mist has\ndecided to bring you back and give you\nanother chance!\n\nGo ahead and close the game and give it\nanother try!"
             Game.text.insert(END, msg)
         else:
                 Game.text.insert(END, str(Game.currentFloor) +\
@@ -362,7 +361,6 @@ class Game(Frame):
         root.overrideredirect(True)
         
         # Declaration of variables
-        hour=StringVar()
         minute=StringVar()
         second=StringVar()
         
@@ -425,7 +423,7 @@ class Game(Frame):
     def specialCodeAct(self, floor, code):
         msg = 'WRONG CODE'
         # should replace with hashed password codes later
-        if code == "e8b2c37a58d295c8828e54a01f87a46b":
+        if code == "854d6fae5ee42911677c739ee1734486":
             floor.delUseable("keypad")
             floor.addItem("keypad_hint", "The solved keypad reads 'W?W?W???W??WW?W?WW?WWWWWW??WW??WW??W????W??W??WWW??W??WWW??W????W???W???WW?WWWWWW??W?WW?W??W???WWW?WWWWWW???W?WWW??W?WWWW??WW?W?WW?WWWWWW??WW??WW??W????W??W????W???W?WWW???WW??W???W?WWW??WW?W?W???WWWWW???WW??WW?WWWWWW??W????W??WW??WWW?WWWWWW??W????W???W?W?W???WW?WWW?WWWWWW??W???WW??W????W???W?W?W???WW?WW??W?WW?W???WW??W??W?WWWW??W?WW?W??W???WW??WW???WW?WWWWWW??W??W?W??W????W???W?WWW??W?WWWW??WW?W?W???WW?WWW?WW???W???WW??WW?WWWWWW??WW??WW??W?WW?W???WW?WW???WW??W???W?WWWW?WWWWWW??WWW?WW??WWWW?W??WWW?WW????WW?WW?WWWWWW??WWW?WW??W?WW?W???WW?WW??WW?WWWW?WWWWWW???W???W??W?WWWW??W????WW?WWWWWW??WW??WW??W??WWW??WW?W?W???W???WW?WWWWWW???W?WWW??W?WWWW??WW?W?WW?WWWWWW??W???WW??WW?W?W???WW??W???W?WWWW?WWWWWW??W?WW?W??W???WWW?WWWWWW?WW??W?W?WWW?WWW?WWWW??W?WWWW??W?WWWW??W?W??WWWW?WWWW??W?W?W??WW?WW?WW?W?WW?WW?WW?W???W'\n")
 
@@ -447,7 +445,7 @@ class Game(Frame):
             return "The short_note reads . . .\n"+\
                    "Dr. Guice just had to have a chess board in this room. Something "+\
                    "about the number of tiles, I think.\n\n"+\
-                   "A small stamp depicting the Roman Colosseum is in the bottom corner with 'wqkoapq ue g(7;c9#yk_5;bvzk' written across it."
+                   "A small stamp depicting the Roman Colosseum is in the bottom corner with 'Tai ymzk efgpqzfe qzdaxxqp mf Fqot itqz uf ime rudef ragzpqp' written across it."
         if (noun == "plaque"):
             return "The plaque reads . . .\n"+\
                    "Here's an easy hint as a reward\n"+\
@@ -479,7 +477,7 @@ class Game(Frame):
                             f"To win and get the prize, you need to call {mustWin} correctly.\n"
                 if(Game.coinflip(tosses, mustWin)):
                     floor.addGrabbable("short_note")
-                    response += "\nYou won!\n\nThe board parts down the middle and a *short_note* floats up beckoning you to take it."
+                    response += "\nYou won!\n\nThe board parts down the middle and a *short_note* floats up beckoning you to *take* it."
                 else:
                     response += "\nYou lost :(\n\nLooks like you'll have to try again."
 
@@ -560,12 +558,12 @@ class Game(Frame):
                     else:
                         Game.currentFloor = Game.currentFloor.codes[code]
                         if (Game.currentFloor.name == "Win"):
-                            response = "Congratulations! You managed to escape Wyly Tower and complete the Wyly Tower Escape Challenge."
+                            response = "Congratulations! \n\nYou managed to escape Wyly Tower and are greeted\nby a group applauding you effort and Tech XXII.\nYou are rewarded by getting the chance to give\nTech XXII some pets. What a treat!\n\nYou've completed The Great Wyly Escape challenge and can now claim your points."
                             stop = True
                         else:
                             response = "You got it! Moved to next challenge floor.\nYou dropped everything you obtained on this floor in the void."
                         if (Game.currentFloor.name == "Floor 3 Elevator"):
-                            response = response + "\n\n" + "Uh oh! There's only 5 minutes left until Wyly Tower closes! \nIf you don't get the last code in time, you'll be stuck inside for who knows how long. \nBetter hurry!"
+                            response = response + "\n\n" + "Uh oh! There's only 5 minutes left until Wyly\nTower closes! \nIf you don't get the last code in time, you'll be stuck inside for who knows how long. \nBetter hurry!"
                             Game.timerThread(self)
                         Game.inventory = []
 
@@ -614,7 +612,7 @@ HEIGHT = 600
 
 # create the window
 window = Tk()
-window.title("Extreme Wyly Tower Escape")
+window.title("The Great Wyly Tower Escape")
 
 # create the GUI as a Tkinter canvas inside the window
 g = Game(window)
