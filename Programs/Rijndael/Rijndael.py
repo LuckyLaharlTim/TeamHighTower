@@ -2,7 +2,7 @@
 # Group Name:   Team Hightower
 # Members:      Cori Albritton, Megan Cox, Peter Ford, Timothy Oliver
 # Assignment:   Program 6 - Rijndael (AES)
-# Date:         9 May 2022
+# Date:         11 May 2022
 ##################################
 
 ##################################
@@ -33,6 +33,10 @@ import sys # import sys for standard input from command line
 import math
 import base64
 from time import time
+from hashlib import sha256
+from Crypto import Random
+from Crypto.Cipher import AES
+from base64 import b64encode
 
 # variables for debug lines and showing the bestShifts if we need to
 #  find doubly -> multiply encrypted plaintext
@@ -44,6 +48,8 @@ CUTOFFBYDICTMATCH = True
 AVG_LENGTH = 5
 PERCENT = 0.3
 DECIDEFUNCTION = 0
+BLOCK_SIZE = 16
+PAD_WITH = "人"
 # 0 - most dictionary matches
 # 1 - most occurences of word 'the'
 
@@ -124,13 +130,6 @@ def checkThreshold(posPlain, wordCount):
         return True
     return False
                            
-##    for word in posPlain.split():
-##        if len(word) > threshold:
-##            if word in miniDict:
-##                count += 1
-##            if count > expectedWords:
-##                return True
-##    return False
 
 # function that runs appropriate 'best plain text' function
 #  ~ all current functions look for the plaintext with the most of something
@@ -170,6 +169,10 @@ def modifyLen(x,y):
 # conducts shift of alphabet by given SHIFT positions for each character to cipher text
 #  encryption just has the inverse of this in process(message)
 def getPlainT(text, key, testing):
+    key = sha256(key).digest()
+    iv = text[:16]
+    cipher = AES.new(key, AES.MODE_CBC,iv)
+    
     plain = ""
     keyIndex = 0 # if needed
 
@@ -221,7 +224,7 @@ def bestPlainT(text, simple):
             skipWord = True
       
         if not skipWord:
-            posPlain = getPlainT(text,modifyLen(word, text),True)
+            posPlain = getPlainT(text,word.encode(),True)
 ##            if getAll:
 ##                filename = f"key{i}.txt"
 ##                f = open(filename, "w")

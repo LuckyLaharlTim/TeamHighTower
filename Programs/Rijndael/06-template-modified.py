@@ -48,7 +48,7 @@ def encrypt(plaintext, key):
 	# encrypt the ciphertext with the key using CBC block cipher mode
 	cipher = AES.new(key, AES.MODE_CBC, iv)
 	# if necessary, pad the plaintext so that it is a multiple of BLOCK SIZE in length
-	plaintext += ((BLOCK_SIZE - len(plaintext) % BLOCK_SIZE)+0) * PAD_WITH
+	plaintext += ((BLOCK_SIZE - len(plaintext) % BLOCK_SIZE)+1) * PAD_WITH
 	# add the IV to the beginning of the ciphertext
 	# IV is at [:16]; ciphertext is at [16:]
 	'''
@@ -64,8 +64,7 @@ plaintext = stdin.read().rstrip("\n")
 print("Plaintext:")
 print(plaintext)
 print()
-ciphertext = plaintext
-'''
+
 ciphertext = encrypt(plaintext, KEY)
 print("Ciphertext (encrypted with {}):".format(KEY))
 print(ciphertext)
@@ -76,7 +75,6 @@ print()
 print("Ciphertext (encoded in base64):")
 print(b64encode(ciphertext).decode("UTF-8", "ignore"))
 print()
-'''
 
 plaintext = decrypt(ciphertext, KEY)
 print("Plaintext (decrypted with {}):".format(KEY))
