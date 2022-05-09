@@ -26,15 +26,9 @@ def decrypt(ciphertext, key):
 	cipher = AES.new(key, AES.MODE_CBC, iv)
 	# the ciphertext is after the IV (so, skip 16 bytes)
 	plaintext = cipher.decrypt(ciphertext[16:])
-	# was ciphertext[16:]
-	# ciphertext[16:].decode("utf-8","ignore")
 
 	# remove potential padding at the end of the plaintext
 	# figure this one out...
-	# fix that relies on padded character being not used in plaintext
-	toRemove = plaintext[-1]
-	while plaintext[-1] == toRemove:
-                plaintext = plaintext[:-1]
 
 	return plaintext
 
@@ -48,14 +42,10 @@ def encrypt(plaintext, key):
 	# encrypt the ciphertext with the key using CBC block cipher mode
 	cipher = AES.new(key, AES.MODE_CBC, iv)
 	# if necessary, pad the plaintext so that it is a multiple of BLOCK SIZE in length
-	plaintext += ((BLOCK_SIZE - len(plaintext) % BLOCK_SIZE)+0) * PAD_WITH
+	plaintext += (BLOCK_SIZE - len(plaintext) % BLOCK_SIZE) * PAD_WITH
 	# add the IV to the beginning of the ciphertext
 	# IV is at [:16]; ciphertext is at [16:]
-	'''
-	print(len(plaintext))
-	print(len(bytes(plaintext.encode("utf-8","ignore"))))
-	'''
-	ciphertext = iv + cipher.encrypt(plaintext.encode("utf-8", "ignore"))
+	ciphertext = iv + cipher.encrypt(plaintext.encode("utf-8"))
 
 	return ciphertext
 
@@ -64,8 +54,7 @@ plaintext = stdin.read().rstrip("\n")
 print("Plaintext:")
 print(plaintext)
 print()
-ciphertext = plaintext
-'''
+
 ciphertext = encrypt(plaintext, KEY)
 print("Ciphertext (encrypted with {}):".format(KEY))
 print(ciphertext)
@@ -74,9 +63,8 @@ print("Ciphertext (in binary):")
 print(ciphertext.decode("utf-8", "ignore"))
 print()
 print("Ciphertext (encoded in base64):")
-print(b64encode(ciphertext).decode("UTF-8", "ignore"))
+print(b64encode(ciphertext).decode("utf-8", "ignore"))
 print()
-'''
 
 plaintext = decrypt(ciphertext, KEY)
 print("Plaintext (decrypted with {}):".format(KEY))

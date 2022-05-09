@@ -49,7 +49,8 @@ AVG_LENGTH = 5
 PERCENT = 0.3
 DECIDEFUNCTION = 0
 BLOCK_SIZE = 16
-PAD_WITH = "人"
+PAD_WITH = "#" #"人"
+BYTES_PAD_WITH = b"#"
 # 0 - most dictionary matches
 # 1 - most occurences of word 'the'
 
@@ -169,34 +170,47 @@ def modifyLen(x,y):
 # conducts shift of alphabet by given SHIFT positions for each character to cipher text
 #  encryption just has the inverse of this in process(message)
 def getPlainT(text, key, testing):
-    key = sha256(key).digest()
-    iv = text[:16]
-    cipher = AES.new(key, AES.MODE_CBC,iv)
-    
-    plain = ""
-    keyIndex = 0 # if needed
 
-    # shorten ciphertext to shorten the amount of time we
-    #  spend making our decision on best plaintext
-    if testing:
-        mText = []
-        limit = math.floor(len(text) * PERCENT)
-        for i in range(limit):
-            mText.append(text[i])
-        text = mText
+    text2 = text.encode("utf-8","ignore")
+
+    plain = ""
+    print(key)
+    key = sha256(key).digest() #.decode("utf-8","ignore")
+    print(f"after hashing key: {key}")
+    iv = text[:16]
+    print(len(iv))
+    iv = iv.encode("utf-8")[:16]
+    print(len(iv))
+    
+##    if not(len(key) % BLOCK_SIZE == 0):
+##        key += PAD_WITH * ((len(key))% BLOCK_SIZE)
+        
+    cipher = AES.new(key, AES.MODE_CBC,iv)
+    plain = cipher.decrypt(text2[len(iv):])
+    
+
+##    # shorten ciphertext to shorten the amount of time we
+##    #  spend making our decision on best plaintext
+##    if testing:
+##        mText = []
+##        limit = math.floor(len(text) * PERCENT)
+##        for i in range(limit):
+##            mText.append(text[i])
+##        text = mText
     
     # for every character . . .
-    for i in range(0,len(text)):
-        # plaintext character is in alphabet (list/string 'alpha')
-        if text[i] in alpha:
-            # subtract the key from the character's position in alphabet
-            #  and mod by the alphabet size (for negative numbers)
-            encodedChar = getChar((getOrdinal(text[i]) - getOrdinal(key[keyIndex])) % letterSize)
-            plain += encodedChar
-            keyIndex += 1
-        # plaintext character is anything else, just repeat the character
-        else:
-            plain += text[i]
+##    for i in range(0,len(text)):
+##        # plaintext character is in alphabet (list/string 'alpha')
+##        if text[i] in alpha:
+##            # subtract the key from the character's position in alphabet
+##            #  and mod by the alphabet size (for negative numbers)
+##            encodedChar = getChar((getOrdinal(text[i]) - getOrdinal(key[keyIndex])) % letterSize)
+##            plain += encodedChar
+##            keyIndex += 1
+##        # plaintext character is anything else, just repeat the character
+##        else:
+##            plain += text[i]
+    
     return plain
     
 # decode code (done for each possibility in the alphabet)
@@ -224,7 +238,7 @@ def bestPlainT(text, simple):
             skipWord = True
       
         if not skipWord:
-            posPlain = getPlainT(text,word.encode(),True)
+            posPlain = getPlainT(text,word.encode("utf-8"),True)
 ##            if getAll:
 ##                filename = f"key{i}.txt"
 ##                f = open(filename, "w")
@@ -251,7 +265,7 @@ def bestPlainT(text, simple):
         
     # return everything for display
     #  (most likely plaintext & the alphabet shift used to obtain it)
-    return [getPlainT(text, modifyLen(bestKey,text), False), bestKey]
+    return [getPlainT(text, modifyLen(bestKey,text), False).decode('utf-8','ignore'), bestKey]
 
             
 
@@ -312,30 +326,34 @@ def process(message):
             simple = False
         else:
             simple = True
-        outputList = bestPlainT(text, simple)
+        outputList = bestPlainT(message, simple)
         outputString += f"KEY={outputList[1]}:\n"
         outputString += outputList[0]
 
     # encrypting block (same as getPlainT(ciphertext), but + SHIFT instead
     elif sys.argv[1] == "-e":
         KEY = sys.argv[2]
-        KEY = modifyLen(KEY, text)
-        keyIndex = 0
-        for i in range(0,len(text)):
-            # plaintext character is in alphabet (list/string 'alpha')
-            if text[i] in alpha:
-                encodedChar = getChar(((getOrdinal(text[i]) + getOrdinal(key[keyIndex])) % letterSize))
-                outputString += encodedChar
-                keyIndex += 1
-            # plaintext character is anything else, just repeat the character
-            else:
-                outputString += text[i]       
+
+        # hash the key (SHA-256) to ensure that it is 32 bytes long
+        key = sha256(KEY).digest()
+        # generate a random 16-byte IV
+        iv = Random.new().read(BLOCK_SIZE)
+
+        # encrypt the ciphertext with the key using CBC block cipher mode
+        cipher = AES.new(key, AES.MODE_CBC, iv)
+        # if necessary, pad the plaintext so that it is a multiple of BLOCK SIZE in length
+        plaintext += ((BLOCK_SIZE - len(plaintext) % BLOCK_SIZE)+0) * PAD_WITH
+        # add the IV to the beginning of the ciphertext
+        # IV is at [:16]; ciphertext is at [16:]
+        
+        ciphertext = iv + cipher.encrypt(plaintext.encode("utf-8")) #"utf-8","ignore" OR "utf-7"
+
+        return ciphertext
 
     # if you want a decode using a specific shift and not most likely
     elif sys.argv[1] == "-c":
         KEY = sys.argv[2]
-        KEY = modifyLen(KEY, text)
-        outputString += f"KEY={sys.argv[2]}:\n"+getPlainT(text,KEY,False)
+        outputString += f"KEY={sys.argv[2]}:\n"+getPlainT(message,KEY.encode('utf-8'),False).decode('utf-8','ignore')
                
 
 
