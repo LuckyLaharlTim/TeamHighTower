@@ -8,7 +8,7 @@
 ##################################
 # Manual
 #
-# python(3) <fileName>.py <flag(s)>  > output
+# python(3) <fileName>.py <flag(s) > output
 #
 # Flags:
 # no flag | will create AND, OR, & XOR versions of the INPUT_IMAGE in the current directory
@@ -26,6 +26,7 @@
 #         (also XORing a xor output is the same visually,
 #         but is larger in size than original)
 ##################################
+
 
 import sys # import sys for standard input from command line
 import math
@@ -63,15 +64,16 @@ rows, cols = img.size
 # print(f"there are {rows*cols} pixels")
 
 def setKey():
-
-    KEY_PIXELS = [[0]*cols]*rows
+    # to preserve data type, make KEY_PIXELS the same as pixels
+    KEY_PIXELS = pixels
+    #[[0]*cols]*rows
 
     
     # fills KEY_PIXELS
     if randKey:
         for row in range(rows):
             for col in range(cols):
-                KEY_PIXELS[row][col] = randint(0,255), randint(0,255), randint(0,255)
+                KEY_PIXELS[row,col] = randint(0,255), randint(0,255), randint(0,255)
 
     else:
         f = open(KEY_FILE)
@@ -80,7 +82,7 @@ def setKey():
         for row in range(rows):
             for col in range(cols):
                 line = line.split(",")
-                KEY_PIXELS[row][col] = int(line[0]), int(line[1]), int(line[2])
+                KEY_PIXELS[row,col] = int(line[0]), int(line[1]), int(line[2])
                 line = f.readline().strip()
     ##            if x==0:
     ##                print(KEY_PIXELS[row][col])
@@ -93,16 +95,16 @@ def setKey():
 KEY_PIXELS = setKey()
 
 def writeKey():
-    for rowCol in KEY_PIXELS:
-        for pixel in rowCol:
-            sys.stdout.write(f"{pixel[0]},{pixel[1]},{pixel[2]}\n")
+    for row in range(rows):
+        for col in range(cols):
+            sys.stdout.write(f"{KEY_PIXELS[row,col][0]},{KEY_PIXELS[row,col][1]},{KEY_PIXELS[row,col][2]}\n")
 
 def buildAND():
         
     for row in range(rows):
         for col in range(cols):
             Or,Og,Ob = Opixels[row,col]
-            Kr,Kg,Kb = KEY_PIXELS[row][col]
+            Kr,Kg,Kb = KEY_PIXELS[row,col]
             r = Or & Kr
             g = Og & Kg
             b = Ob & Kb
@@ -132,7 +134,7 @@ def buildOR():
     for row in range(rows):
         for col in range(cols):
             Or,Og,Ob = Opixels[row,col]
-            Kr,Kg,Kb = KEY_PIXELS[row][col]
+            Kr,Kg,Kb = KEY_PIXELS[row,col]
             r = Or | Kr
             g = Og | Kg
             b = Ob | Kb
@@ -162,7 +164,7 @@ def buildXOR():
     for row in range(rows):
         for col in range(cols):
             Or,Og,Ob = Opixels[row,col]
-            Kr,Kg,Kb = KEY_PIXELS[row][col]
+            Kr,Kg,Kb = KEY_PIXELS[row,col]
             r = Or ^ Kr
             g = Og ^ Kg
             b = Ob ^ Kb
